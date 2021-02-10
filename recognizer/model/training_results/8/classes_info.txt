@@ -1,0 +1,4 @@
+Training images per class:
+{"arrow_line_left": 784, "arrow_rectangle_up": 805, "start_end": 887, "arrow_rectangle_left": 579, "arrow_rectangle_down": 776, "arrow_line_up": 432, "arrow_line_right": 812, "arrow_line_down": 823, "arrow_rectangle_right": 845, "print": 848, "scan": 873, "process": 896, "decision": 860, "bg": 0}
+Num classes (including bg):
+14
