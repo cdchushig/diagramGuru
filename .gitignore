@@ -4,4 +4,7 @@ db.sqlite3
 *.h5
 *.hdf5
 *.csv
-recognizer/img_tests/*
+detector/
+detector/img_tests/*
+uploads/
+diagrams/
