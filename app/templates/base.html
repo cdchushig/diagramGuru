@@ -1,0 +1,69 @@
+{% load i18n %}
+{% trans alert %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="description" content="Analyze your diagram to assess your Modeling skills">
+    <meta name="keywords" content="Stamp, Startup, Multipurpose, Bootstrap, Landing page, Template, Registration, Landing">
+    <meta name="author" content="URJC JKU JYU">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    {% block stylesheets %}
+      <link rel="icon" href="{% static 'app/img/favicon.ico' %}">
+      <link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+      <link rel="stylesheet" href="{% static 'app/icons/icons.css' %}">
+      <link rel="stylesheet" href="{% static 'app/css/red.css' %}">
+      <link rel="stylesheet" href="{% static 'app/css/bootstrap-main.css' %}">
+      <link rel="stylesheet" href="{% static 'app/css/styles.css' %}">
+      <link rel="stylesheet" href="{% static 'app/css/animate.css' %}">
+      <link rel="stylesheet" href="{% static 'app/css/default.css' %}">
+      <link rel="stylesheet" href="{% static 'app/css/responsive.css' %}">
+      <link rel="stylesheet" href="static/app/css/css_002.css">
+      <link rel="stylesheet" href="static/app/css/css.css">
+      <link rel="stylesheet" href="static/app/css/owl_002.css">
+      <link rel="stylesheet" href="static/app/css/owl.css">
+      <link rel="stylesheet" href="static/app/css/nivo-lightbox.css">
+    {% endblock stylesheets %}
+
+    <title>Diagram Guru</title>
+
+  </head>
+
+  <body>
+
+    <!-- Includes -->
+    {% include "_header.html" %}
+
+    {% block content %}{% endblock content %}
+
+    <!-- Includes -->
+    {% include "_footer.html" %}
+
+    <!-- JavaScript -->
+    {% block scripts %}
+      <script src="{% static 'app/js/jquery.min.js' %}"></script>
+      <script>
+          /* PRE LOADER */
+          jQuery(window).load(function () {
+              "use strict";
+              jQuery(".status").fadeOut();
+              jQuery(".preloader").delay(1000).fadeOut("slow");
+          })
+      </script>
+      <script src="{% static 'app/js/bootstrap-filestyle.js' %}"></script>
+      <script src="{% static 'app/js/progress-bar.js' %}"></script>
+      <script src="{% static 'app/js/jquery.nav.js' %}"></script>
+      <script src="{% static 'app/js/jquery_main.js' %}"></script>
+      <script src="{% static 'app/js/nivo-lightbox.js' %}"></script>
+      <script src="{% static 'app/js/smoothscroll.js' %}"></script>
+
+    {% endblock scripts %}
+
+    {% block extrascripts %}{% endblock extrascripts %}
+
+  </body>
+
+</html>
