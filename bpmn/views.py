@@ -5,6 +5,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views import generic
+from django.template import Context, Template
 
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalReadView
 
@@ -108,9 +109,15 @@ def open_bpmn(request, id):
 
 
 def open_external_bpmn(request):
+    print(request.session.get('diagram_name'))
 
+    bpmn_filename = request.session.get('diagram_name')
     output_directory = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
-    path_bpmn_file = output_directory + 'test3.xml'
+    path_bpmn_file = output_directory + bpmn_filename + '.xml'
+
+    print('****')
+    print(path_bpmn_file)
+    print('****')
 
     # parser = etree.XMLParser(ns_clean=True)
     tree = etree.parse(path_bpmn_file)

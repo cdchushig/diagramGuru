@@ -9,6 +9,7 @@ urlpatterns = [
     path('create_bpmn', bpmn_views.DiagramCreateView.as_view(), name="create_bpmn"),
     path('read_bpmn/<int:pk>', bpmn_views.DiagramReadView.as_view(), name='read_bpmn'),
     path('open_bpmn/<int:id>', bpmn_views.open_bpmn, name="open_bpmn"),
+    # path('open_external_bpmn/<str:diagram_id>', bpmn_views.open_external_bpmn, name="open_external_bpmn"),
     path('open_external_bpmn', bpmn_views.open_external_bpmn, name="open_external_bpmn"),
     path('delete_bpmn/(\d+)/', bpmn_views.delete_bpmn, name="delete_bpmn"),
     path('modeler/', bpmn_views.modeler, name='modeler'),
