@@ -54,7 +54,7 @@ def list_bpmn(request):
 
 
 def create_new_diagram(request):
-    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'designer', 'diagrams', 'default.designer')
+    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'bpmn', 'diagrams', 'default.bpmn')
     with open(bpmn_filename, 'r') as f:
         bpmn_file_content = f.read()
     context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
@@ -93,15 +93,13 @@ def save_bpmn(request):
 
 def open_bpmn(request, id):
     try:
-        print('holi****')
         qs = Diagram.objects.filter(id=id)
         print(qs[0])
-        print('holi****')
         if qs.exists():
             bpmn = qs[0]
             bpmn_file_content = bpmn.xml_content
             context = {'bpmn_file_content': bpmn_file_content, 'id_bpmn': bpmn.id}
-            return render(request, 'designer/modeler.html', context)
+            return render(request, 'bpmn/modeler.html', context)
 
     except Exception as err:
         print('exception')

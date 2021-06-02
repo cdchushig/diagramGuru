@@ -19,14 +19,14 @@
     </div>
 {% endif %}
 
-<a class="btn btn-success" href="/designer/create_bpmn" style="margin:5px;">Create new Diagram</a>
+<a class="btn btn-success" href="/bpmn/create_bpmn" style="margin:5px;">Create new Diagram</a>
 
 {% if bpmn_list %}
     <table class="table table-striped table-bordered">
 {% for bpmn in bpmn_list %}
     <tr>
-        <td align="center"><a href="/designer/open_bpmn/{{ bpmn.id }}/">{{ bpmn.name }}</a></td>
-        <td><a class="btn btn-danger" href="/designer/delete_bpmn/{{ bpmn.id }}/">Exclude</a></td>
+        <td align="center"><a href="/bpmn/open_bpmn/{{ bpmn.id }}/">{{ bpmn.name }}</a></td>
+        <td><a class="btn btn-danger" href="/bpmn/delete_bpmn/{{ bpmn.id }}/">Exclude</a></td>
     </tr>
 {% endfor %}
     </table>
