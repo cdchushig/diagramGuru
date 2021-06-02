@@ -16,7 +16,7 @@
   <script src="{% static 'bpmn/js/jquery.bootstrap.modal.forms.js' %}"></script>
 
 <!--  {% load static %}-->
-<!--  <script src="{% static 'bpmn/js/jquery.js' %}"></script>-->
+<!--  <script src="{% static 'designer/js/jquery.js' %}"></script>-->
 <!--  <script src="js/jquery.js"></script>-->
 
   <!-- example of layout style -->
@@ -176,7 +176,7 @@
       $('#close-button').click(function(){
           // #TODO: check for unsaved changes
          if (window.confirm("Are you sure you want to close this Diagram?")){
-             document.location.href="/bpmn/list_diagrams"
+             document.location.href="../list_diagrams"
          }
       });
 
@@ -198,14 +198,14 @@
     <!--
       Thanks for trying out our BPMN toolkit!
 
-      This example uses the pre-built distribution of the bpmn-js modeler.
+      This example uses the pre-built distribution of the designer-js modeler.
       Consider rolling your own distribution to have more flexibility
       regarding which features to include.
 
       Checkout our advanced examples section to learn more:
       * https://github.com/bpmn-io/bpmn-js-examples#advanced
 
-      To get a bit broader overview over how bpmn-js works,
+      To get a bit broader overview over how designer-js works,
       follow our walkthrough:
       * https://bpmn.io/toolkit/bpmn-js/walkthrough/
 

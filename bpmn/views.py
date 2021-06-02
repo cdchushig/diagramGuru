@@ -19,7 +19,7 @@ from io import StringIO, BytesIO
 
 
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
-
+PATH_DIAGRAM_GURU_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
 
 class Index(generic.ListView):
     model = Diagram
@@ -54,7 +54,7 @@ def list_bpmn(request):
 
 
 def create_new_diagram(request):
-    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'bpmn', 'diagrams', 'default.bpmn')
+    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'designer', 'diagrams', 'default.designer')
     with open(bpmn_filename, 'r') as f:
         bpmn_file_content = f.read()
     context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
@@ -101,7 +101,7 @@ def open_bpmn(request, id):
             bpmn = qs[0]
             bpmn_file_content = bpmn.xml_content
             context = {'bpmn_file_content': bpmn_file_content, 'id_bpmn': bpmn.id}
-            return render(request, 'bpmn/modeler.html', context)
+            return render(request, 'designer/modeler.html', context)
 
     except Exception as err:
         print('exception')
@@ -111,24 +111,13 @@ def open_bpmn(request, id):
 def open_external_bpmn(request):
     print(request.session.get('diagram_name'))
 
-    bpmn_filename = request.session.get('diagram_name')
-    output_directory = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
-    path_bpmn_file = output_directory + bpmn_filename + '.xml'
+    bpmn_filename_xml = request.session.get('diagram_name')
+    bpmn_path_filename_xml = PATH_DIAGRAM_GURU_DIAGRAMS + bpmn_filename_xml + '.xml'
 
-    print('****')
-    print(path_bpmn_file)
-    print('****')
-
-    # parser = etree.XMLParser(ns_clean=True)
-    tree = etree.parse(path_bpmn_file)
-    # tree = etree.parse(StringIO(xml), parser)
+    tree = etree.parse(bpmn_path_filename_xml)
     xml_str = etree.tostring(tree.getroot())
-
-    # xml_tree = ET.parse(path_bpmn_file)
-    # xml_str = ET.tostring(xml_tree, encoding='utf8', method='xml')
-
-    # bpmn_file_content = bpmn.xml_content
     context = {'bpmn_file_content': xml_str, 'id_bpmn': 1}
+
     return render(request, 'modeler.html', context)
 
 
