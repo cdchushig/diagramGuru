@@ -4,7 +4,8 @@ db.sqlite3
 *.h5
 *.hdf5
 *.csv
+diagram_detector/
+bpmn_python/
 detector/
-detector/img_tests/*
 uploads/
 diagrams/

@@ -6,3 +6,4 @@ diagramGuruTool is an analytical tool that evaluates diagrams according to diffe
 ```
 python manage.py runserver 8080
 ```
+
