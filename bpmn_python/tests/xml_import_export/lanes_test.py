@@ -10,7 +10,7 @@ import bpmn_python.bpmn_diagram_rep as diagram
 
 class BPMNEditorTests(unittest.TestCase):
     """
-    This class contains test for bpmn-python package functionality using an example BPMN diagram, which contains
+    This class contains test for bpmn_python package functionality using an example BPMN diagram, which contains
     multiple pool and lane elements.
     """
     output_directory = "./output/test-lane/"

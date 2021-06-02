@@ -11,7 +11,7 @@ import bpmn_python.bpmn_diagram_rep as diagram
 
 class BPMNEditorTests(unittest.TestCase):
     """
-    This class contains test for bpmn-python package functionality using an example BPMN diagram created in BPMNEditor.
+    This class contains test for bpmn_python package functionality using an example BPMN diagram created in BPMNEditor.
     """
     output_directory = "./output/test-bpmneditor/"
     example_path = "../examples/xml_import_export/bpmn_editor_simple_example.xml"

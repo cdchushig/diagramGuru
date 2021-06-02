@@ -11,7 +11,7 @@ import bpmn_python.bpmn_diagram_rep as diagram
 
 class CamundaComplexTests(unittest.TestCase):
     """
-    This class contains test for bpmn-python package functionality using a complex example of BPMN diagram
+    This class contains test for bpmn_python package functionality using a complex example of BPMN diagram
     created in bpmn-io (Camunda library implementation).
     """
     output_directory = "./output/test-camunda/complex/"

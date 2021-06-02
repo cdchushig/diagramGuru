@@ -4,9 +4,9 @@ Package provides functionality for importing from BPMN-E2 XML to graph represent
 """
 from xml.dom import minidom
 
-import bpmn_python.bpmn_import_utils as utils
-import bpmn_python.bpmn_python_consts as consts
-import bpmn_python.bpmn_diagram_import as bpmn_import
+import bpmn_python.bpmn_python.bpmn_import_utils as utils
+import bpmn_python.bpmn_python.bpmn_python_consts as consts
+import bpmn_python.bpmn_python.bpmn_diagram_import as bpmn_import
 
 
 class BpmnE2DiagramGraphImport(object):

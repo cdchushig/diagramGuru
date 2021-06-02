@@ -6,12 +6,12 @@ import uuid
 
 import networkx as nx
 
-import bpmn_python.bpmn_diagram_exception as bpmn_exception
-import bpmn_python.bpmn_diagram_export as bpmn_export
-import bpmn_python.bpmn_diagram_import as bpmn_import
-import bpmn_python.bpmn_process_csv_export as bpmn_csv_export
-import bpmn_python.bpmn_process_csv_import as bpmn_csv_import
-import bpmn_python.bpmn_python_consts as consts
+import bpmn_python.bpmn_python.bpmn_diagram_exception as bpmn_exception
+import bpmn_python.bpmn_python.bpmn_diagram_export as bpmn_export
+import bpmn_python.bpmn_python.bpmn_diagram_import as bpmn_import
+import bpmn_python.bpmn_python.bpmn_process_csv_export as bpmn_csv_export
+import bpmn_python.bpmn_python.bpmn_process_csv_import as bpmn_csv_import
+import bpmn_python.bpmn_python.bpmn_python_consts as consts
 
 
 class BpmnDiagramGraph(object):
@@ -302,7 +302,6 @@ class BpmnDiagramGraph(object):
         :param node_id: string object. ID of node. Default value - None.
         :return: a tuple, where first value is task ID, second a reference to created object.
         """
-        print('holixxxxx')
         return self.add_flow_node_to_diagram(process_id, consts.Consts.task, task_name, node_id)
 
     def add_subprocess_to_diagram(self, process_id, subprocess_name, is_expanded=False, triggered_by_event=False,
