@@ -1,10 +1,13 @@
 import os
-import logging
+
 from datetime import datetime
 import base64
 import json
 import requests
 import subprocess
+import itertools as it
+import operator
+
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -18,17 +21,25 @@ from .models import Diagram
 from .serializers import DiagramSerializer
 from .app_consts import Consts
 
+from .diagram_graph import DiagramGraph
+import networkx as nx
+
+from .diagram_node import DiagramNode
+from diagram_utils import compute_distance_between_nodes
+
 from bpmn_python.bpmn_python.bpmn_diagram_layouter import generate_layout
 from bpmn_python.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
-from bpmn_python.bpmn_python.bpmn_diagram_visualizer import bpmn_diagram_to_png
+from bpmn_python.bpmn_python.bpmn_diagram_visualizer import visualize_diagram
 
-
+import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-
+DIST_MIN_EDGING = 420
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
 PATH_DIR_UPLOADS = PATH_DIAGRAM_GURU_PROJECT + "/uploads/"
 PATH_DIR_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
+
+list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
 
 
 def index_app(request):
@@ -36,6 +47,11 @@ def index_app(request):
 
 
 def show_dashboard(request):
+    """
+    Handle Request POST with uploded file
+    :param request: Request object.
+    :return:
+    """
     if request.method == 'POST':
         upload_file_form = UploadFileForm(request.POST, request.FILES)
         if upload_file_form.is_valid():
@@ -47,6 +63,12 @@ def show_dashboard(request):
 
 
 def do_cmd_to_shell_diagram_detector(diagram_path_filename):
+    """
+    Execute a cmd command and return output string
+    :param diagram_path_filename: String object.
+    :return: dict_objects. Dictionary object. Dictionary with diagram objects.
+    """
+    logging.info("do_cmd_to_shell_diagram_detector")
 
     script_path_filename = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/detector_main.py'
 
@@ -62,6 +84,12 @@ def do_cmd_to_shell_diagram_detector(diagram_path_filename):
 
 
 def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_unique_id_with_extension):
+    """
+    Do request to API diagram detector.
+    :param img_bytes:
+    :param diagram_filename_uploaded_unique_id_with_extension:
+    :return:
+    """
     im_b64 = base64.b64encode(img_bytes).decode("utf8")
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
     payload = json.dumps({"image": im_b64, "diagram_name": diagram_filename_uploaded_unique_id_with_extension})
@@ -76,12 +104,23 @@ def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_uniq
 
 
 def save_file_uploaded(diagram_file_uploaded, diagram_path_filename_uploaded):
+    """
+    Save diagram file upload to local folder.
+    :param diagram_file_uploaded:
+    :param diagram_path_filename_uploaded:
+    :return:
+    """
     with open(diagram_path_filename_uploaded, 'wb+') as destination:
         for chunk in diagram_file_uploaded.chunks():
             destination.write(chunk)
 
 
 def get_filename_unique_id_and_ext(diagram_filename_with_extension):
+    """
+    Get a filename with an unique id
+    :param diagram_filename_with_extension: String object. Name of file uploaded with extension.
+    :return: String object.
+    """
     unique_id = datetime.now().strftime('_%Y_%m_%d_%H%M%S')
     list_diagram_filename = diagram_filename_with_extension.split('.')
     ext_file = '.' + list_diagram_filename[1]
@@ -96,58 +135,157 @@ def handle_uploaded_file(diagram_file_uploaded):
     save_file_uploaded(diagram_file_uploaded, diagram_path_filename_unique_id)
 
     dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
-
-    build_bpmn_from_nodes(dict_diagram_objects, diagram_filename_unique_id)
+    diagram_graph = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
+    transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id)
 
     return diagram_filename_unique_id
 
 
-def extract_diagram_type_and_position(dict_node):
-    type_diagram_object = dict_node['class_shape']
-    vector_positions = dict_node['coordinate']
-    return type_diagram_object, vector_positions
+def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
+    # list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
+    type_diagram_element = diagram_node.get_type()
+    print(type_diagram_element)
+    if type_diagram_element == 'start_end':
+        return bpmn_graph.add_task_to_diagram(process_id, task_name="")
+    elif type_diagram_element == 'scan':
+        return bpmn_graph.add_task_to_diagram(process_id, task_name="")
+    elif type_diagram_element == 'process':
+        return bpmn_graph.add_task_to_diagram(process_id, task_name="")
+    elif type_diagram_element == 'decision':
+        return bpmn_graph.add_parallel_gateway_to_diagram(process_id, "")
 
 
-def build_bpmn_from_nodes(dict_objects, diagram_filename_unique_id):
+def create_graph_from_list_nodes(dict_objects, verbose=0):
     """
-    Build a BPMN file with a dictionary of elements linked to a diagram
-    :param dict_objects: Dictionary with elements of diagram
-    :param diagram_filename_unique_id:
+    Create a DiagramGraph object with diagram objects (nodes)
+    :param verbose:
+    :param dict_objects:
     :return:
     """
-    logging.info("Build bpmn from nodes")
+    logging.info("create_graph_from_list_nodes")
 
-    output_bpmn_file = diagram_filename_unique_id + '.xml'
+    list_diagram_nodes = []
+    diagram_graph = nx.Graph()
+    for count, node in enumerate(dict_objects['nodes']):
+        diagram_node = DiagramNode(count, node['coordinate'], node['class_shape'], node['text'])
+        list_diagram_nodes.append(diagram_node)
+        if verbose:
+            print(diagram_node)
+
+    list_diagram_nodes_ordered = order_nodes_by_center_positions(list_diagram_nodes)
+
+    for node_item in list_diagram_nodes_ordered:
+        diagram_graph.add_node(node_item.id, data=node_item)
+
+    dict_connected_nodes = build_dictionary_with_connected_nodes(diagram_graph)
+    list_tuples_connected_nodes = build_list_tuples_connected_nodes(dict_connected_nodes, diagram_graph)
+    diagram_graph = update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes)
+
+    return diagram_graph
+
+
+def update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes):
+    for tuple_node in list_tuples_connected_nodes:
+        diagram_graph.add_edge(tuple_node[0], tuple_node[1])
+
+    return diagram_graph
+
+
+def build_dictionary_with_connected_nodes(diagram_graph):
+    """
+    Build a Dictionary with ids of connected nodes
+    :param diagram_graph:
+    :return:
+    """
+    dict_tuples_nodes = {}
+    for n1, n2 in it.combinations(diagram_graph.nodes(), 2):
+        if n1 in dict_tuples_nodes.keys():
+            list_id_nodes = dict_tuples_nodes.get(n1)
+            list_id_nodes.append(n2)
+            dict_tuples_nodes.update({n1: list_id_nodes})
+        else:
+            dict_tuples_nodes[n1] = [n2]
+
+    return dict_tuples_nodes
+
+
+def build_list_tuples_connected_nodes(dict_tuples_nodes, diagram_graph):
+    """
+    Build list of tuples of nodes which are connected according to distance
+    :param dict_tuples_nodes:
+    :param diagram_graph:
+    :return:
+    """
+    list_node_edges = []
+    for id_node_x, list_nodes in dict_tuples_nodes.items():
+        list_aux_tuples = []
+        for id_node_y in list_nodes:
+            dist_nodes = compute_distance_between_nodes(diagram_graph.node[id_node_x]['data'],
+                                                        diagram_graph.node[id_node_y]['data'])
+            tuple_node = (id_node_x, id_node_y, dist_nodes)
+            list_aux_tuples.append(tuple_node)
+
+        list_node_edges.extend(get_nodes_with_minimum_distance(list_aux_tuples))
+
+    return list_node_edges
+
+
+def get_nodes_with_minimum_distance(list_nodes):
+    list_nodes_connected = []
+    min_node = min(list_nodes, key=operator.itemgetter(2))
+
+    for tuple_node in list_nodes:
+        if min_node[2] <= tuple_node[2] <= DIST_MIN_EDGING:
+            list_nodes_connected.append(tuple_node)
+
+    return list_nodes_connected
+
+
+def order_nodes_by_center_positions(list_nodes):
+    """
+    Order list of DiagramNode by center positions
+    :param list_nodes: List of DiagramNode.
+    :return:
+    """
+    list_nodes_sorted = sorted(list_nodes, key=lambda x: [x.centers[1], x.centers[0]])
+    list_nodes_sorted_filtered = list(filter(lambda x: x.type in list_diagram_types_allowed, list_nodes_sorted))
+    return list_nodes_sorted_filtered
+
+
+def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id):
+    """
+    Build a BPMN file with a dictionary of elements linked to a diagram
+    :param diagram_graph: DiagramGraph object.
+    :param diagram_filename_unique_id: string object.
+    :return:
+    """
+    logging.info("transform_graph_to_bpmn")
 
     bpmn_graph = BpmnE2DiagramGraph()
     bpmn_graph.create_new_diagram_graph(diagram_name="diagram1")
     process_id = bpmn_graph.add_process_to_diagram()
 
-    # [start_id, _] = bpmn_graph.add_start_event_to_diagram(process_id, start_event_name="")
+    print('diagram_graph')
+    print(*diagram_graph)
+    print('----')
 
-    for dict_diagram_node in dict_objects['nodes']:
-        type_diagram_object, vector_positions = extract_diagram_type_and_position(dict_diagram_node)
+    task_id_src = 1000
+    task_id_dst = 1000
+    for tuple_connected_nodes in diagram_graph.edges:
 
-        if type_diagram_object == 'process':
-            [task1_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="")
-        elif type_diagram_object == 'decision':
-            [task2_id, _] = bpmn_graph.add_parallel_gateway_to_diagram(process_id)
+        [task1_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[0]]['data'],
+                                                  process_id,
+                                                  bpmn_graph)
 
-    # [task1_id, _] = bpmn_graph.add_task_to_diagram(process_id, task_name="")
-    # [task2_id, _] = bpmn_graph.add_exclusive_gateway_to_diagram(process_id)
-    # [task2_id, _] = bpmn_graph.add_parallel_gateway_to_diagram(process_id)
+        [task2_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[1]]['data'],
+                                                  process_id,
+                                                  bpmn_graph)
 
-    # [end_id, _] = bpmn_graph.add_end_event_to_diagram(process_id, end_event_name="")
-
-    # bpmn_graph.add_sequence_flow_to_diagram(process_id, start_id, task1_id,  "")
-
-    # bpmn_graph.add_sequence_flow_to_diagram(process_id, task1_id, task2_id, "")
-    # bpmn_graph.add_sequence_flow_to_diagram(process_id, task2_id, end_id, "")
+        bpmn_graph.add_sequence_flow_to_diagram(process_id, task1_id, task2_id, "")
+        task_id_src = task2_id
 
     generate_layout(bpmn_graph)
-    bpmn_graph.export_xml_file(PATH_DIR_DIAGRAMS, output_bpmn_file)
-
-    # bpmn_diagram_to_png(bpmn_graph, output_directory + name_diagram_file_uploaded_without_ext)
+    bpmn_graph.export_xml_file(PATH_DIR_DIAGRAMS, diagram_filename_unique_id + '.xml')
 
 
 @api_view(['GET', 'POST'])
