@@ -62,8 +62,6 @@ class BpmnE2DiagramGraph(bpmn_rep.BpmnDiagramGraph):
         self.decision_points = {}
         self.associations = {}
 
-
-
     def load_diagram_from_xml_file(self, filepath):
         """
         Reads an XML file from given filepath and maps it into inner representation of BPMN-E2 diagram.

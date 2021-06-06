@@ -21,15 +21,13 @@ from .models import Diagram
 from .serializers import DiagramSerializer
 from .app_consts import Consts
 
-from .diagram_graph import DiagramGraph
 import networkx as nx
 
 from .diagram_node import DiagramNode
-from diagram_utils import compute_distance_between_nodes
+from app.diagram_utils import compute_distance_between_nodes
 
 from bpmn_python.bpmn_python.bpmn_diagram_layouter import generate_layout
 from bpmn_python.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
-from bpmn_python.bpmn_python.bpmn_diagram_visualizer import visualize_diagram
 
 import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)

@@ -283,10 +283,10 @@ class BpmnDiagramGraph(object):
         self.diagram_graph.nodes[node_id][consts.Consts.process] = process_id
 
         # Adding some dummy constant values
-        self.diagram_graph.nodes[node_id][consts.Consts.width] = "100"
+        self.diagram_graph.nodes[node_id][consts.Consts.width] = "120"
         self.diagram_graph.nodes[node_id][consts.Consts.height] = "100"
-        self.diagram_graph.nodes[node_id][consts.Consts.x] = "100"
-        self.diagram_graph.nodes[node_id][consts.Consts.y] = "100"
+        self.diagram_graph.nodes[node_id][consts.Consts.x] = "200"
+        self.diagram_graph.nodes[node_id][consts.Consts.y] = "200"
         return node_id, self.diagram_graph.nodes[node_id]
 
     def add_task_to_diagram(self, process_id, task_name="", node_id=None):

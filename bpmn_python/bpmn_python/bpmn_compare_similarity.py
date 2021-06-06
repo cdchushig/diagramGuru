@@ -5,9 +5,10 @@ Similarity of business process models: Metrics and evaluation
 """
 
 from Levenshtein import distance
-from bpmn_python.bpmn_diagram_rep import BpmnDiagramGraph
+from bpmn_python.bpmn_python.bpmn_diagram_rep import BpmnDiagramGraph
 import os
 import pandas as pd
+
 
 class CompareBPMN(object):
     def __init__(self, export_csv=False, export_excel=True):
