@@ -22,12 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '@m6z!3%&is_t5k7o%so@m=42m*+qgk$%^stuio51czx0gj2s99'
+# SECRET_KEY = '@m6z!3%&is_t5k7o%so@m=42m*+qgk$%^stuio51czx0gj2s99'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.environ.get('DIAGRAM_GURU_SECRET_KEY', 'not-secret-key')
 
-ALLOWED_HOSTS = []
+DEBUG = os.environ.get('DIAGRAM_GURU_DEBUG', False)
+
+ALLOWED_HOSTS = os.environ.get('DIAGRAM_GURU_ALLOWED_HOSTS').split(",")
 
 
 # Application definition
@@ -78,18 +80,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'diagramGuru.wsgi.application'
 
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'diagramguru_db',
-        'USER': 'diagramguru',
-        'PASSWORD': 'password_diagramguru',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': os.environ.get('DIAGRAM_GURU_SQLENGINE'),
+        'NAME': os.environ.get('DIAGRAM_GURU_DATABASE_NAME'),
+        'USER': os.environ.get('DIAGRAM_GURU_DATABASE_USER'),
+        'PASSWORD': os.environ.get('DIAGRAM_GURU_DATABASE_PASSWORD'),
+        'HOST': os.environ.get('DIAGRAM_GURU_DATABASE_HOST'),
+        'PORT': os.environ.get('DIAGRAM_GURU_DATABASE_PORT'),
+        'OPTIONS': {
+               'autocommit': True,
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
