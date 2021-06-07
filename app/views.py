@@ -8,6 +8,8 @@ import subprocess
 import itertools as it
 import operator
 
+import random
+import string
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -143,14 +145,16 @@ def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
     # list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
     type_diagram_element = diagram_node.get_type()
     print(type_diagram_element)
+    letters = string.ascii_lowercase
+    text_element = ''.join(random.choice(letters) for i in range(5))
     if type_diagram_element == 'start_end':
-        return bpmn_graph.add_start_event_to_diagram(process_id, start_event_name="")
+        return bpmn_graph.add_start_event_to_diagram(process_id, start_event_name=text_element)
     elif type_diagram_element == 'scan':
-        return bpmn_graph.add_task_to_diagram(process_id, task_name="")
+        return bpmn_graph.add_task_to_diagram(process_id, task_name=text_element)
     elif type_diagram_element == 'process':
-        return bpmn_graph.add_task_to_diagram(process_id, task_name="")
+        return bpmn_graph.add_task_to_diagram(process_id, task_name=text_element)
     elif type_diagram_element == 'decision':
-        return bpmn_graph.add_parallel_gateway_to_diagram(process_id, "")
+        return bpmn_graph.add_parallel_gateway_to_diagram(process_id, text_element)
 
 
 def create_graph_from_list_nodes(dict_objects, verbose=0):
@@ -269,12 +273,8 @@ def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id):
     m_adj = nx.adjacency_matrix(diagram_graph)
     m_adj_dense = m_adj.todense()
 
-    print(m_adj_dense[0])
+    print(m_adj_dense)
     print(type(m_adj_dense))
-
-    for row_n in m_adj_dense:
-        for col_n in row_n:
-            print(m_adj_dense[row_n, col_n])
 
     task_id_src = 1000
     task_id_dst = 1000
@@ -297,7 +297,6 @@ def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id):
 
         bpmn_graph.add_sequence_flow_to_diagram(process_id, task_id_src, task_id_dst, "")
         task_id_src = task2_id
-
 
     for (u, v) in diagram_graph.edges:
         print(f"({u}, {v})")
