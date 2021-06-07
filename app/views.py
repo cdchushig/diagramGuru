@@ -32,7 +32,7 @@ from bpmn_python.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
 import logging
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
-DIST_MIN_EDGING = 420
+DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
 PATH_DIR_UPLOADS = PATH_DIAGRAM_GURU_PROJECT + "/uploads/"
 PATH_DIR_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
@@ -144,7 +144,7 @@ def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
     type_diagram_element = diagram_node.get_type()
     print(type_diagram_element)
     if type_diagram_element == 'start_end':
-        return bpmn_graph.add_task_to_diagram(process_id, task_name="")
+        return bpmn_graph.add_start_event_to_diagram(process_id, start_event_name="")
     elif type_diagram_element == 'scan':
         return bpmn_graph.add_task_to_diagram(process_id, task_name="")
     elif type_diagram_element == 'process':
@@ -167,26 +167,29 @@ def create_graph_from_list_nodes(dict_objects, verbose=0):
     for count, node in enumerate(dict_objects['nodes']):
         diagram_node = DiagramNode(count, node['coordinate'], node['class_shape'], node['text'])
         list_diagram_nodes.append(diagram_node)
-        if verbose:
-            print(diagram_node)
 
     list_diagram_nodes_ordered = order_nodes_by_center_positions(list_diagram_nodes)
 
     for node_item in list_diagram_nodes_ordered:
         diagram_graph.add_node(node_item.id, data=node_item)
+        if verbose:
+            print(node_item)
 
     dict_connected_nodes = build_dictionary_with_connected_nodes(diagram_graph)
     list_tuples_connected_nodes = build_list_tuples_connected_nodes(dict_connected_nodes, diagram_graph)
-    diagram_graph = update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes)
+    # diagram_graph = update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes)
 
-    return diagram_graph
-
-
-def update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes):
     for tuple_node in list_tuples_connected_nodes:
         diagram_graph.add_edge(tuple_node[0], tuple_node[1])
 
     return diagram_graph
+
+
+# def update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes):
+#     for tuple_node in list_tuples_connected_nodes:
+#         diagram_graph.add_edge(tuple_node[0], tuple_node[1])
+#
+#     return diagram_graph
 
 
 def build_dictionary_with_connected_nodes(diagram_graph):
@@ -263,24 +266,41 @@ def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id):
     bpmn_graph.create_new_diagram_graph(diagram_name="diagram1")
     process_id = bpmn_graph.add_process_to_diagram()
 
-    print('diagram_graph')
-    print(*diagram_graph)
-    print('----')
+    m_adj = nx.adjacency_matrix(diagram_graph)
+    m_adj_dense = m_adj.todense()
+
+    print(m_adj_dense[0])
+    print(type(m_adj_dense))
+
+    for row_n in m_adj_dense:
+        for col_n in row_n:
+            print(m_adj_dense[row_n, col_n])
 
     task_id_src = 1000
     task_id_dst = 1000
-    for tuple_connected_nodes in diagram_graph.edges:
+    for count, tuple_connected_nodes in enumerate(diagram_graph.edges):
+        if count == 0:
+            [task1_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[0]]['data'],
+                                                      process_id,
+                                                      bpmn_graph)
 
-        [task1_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[0]]['data'],
-                                                  process_id,
-                                                  bpmn_graph)
+            [task2_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[1]]['data'],
+                                                      process_id,
+                                                      bpmn_graph)
+            task_id_src = task1_id
+            task_id_dst = task2_id
+        else:
+            [task2_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[1]]['data'],
+                                                      process_id,
+                                                      bpmn_graph)
+            task_id_dst = task2_id
 
-        [task2_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[1]]['data'],
-                                                  process_id,
-                                                  bpmn_graph)
-
-        bpmn_graph.add_sequence_flow_to_diagram(process_id, task1_id, task2_id, "")
+        bpmn_graph.add_sequence_flow_to_diagram(process_id, task_id_src, task_id_dst, "")
         task_id_src = task2_id
+
+
+    for (u, v) in diagram_graph.edges:
+        print(f"({u}, {v})")
 
     generate_layout(bpmn_graph)
     bpmn_graph.export_xml_file(PATH_DIR_DIAGRAMS, diagram_filename_unique_id + '.xml')
