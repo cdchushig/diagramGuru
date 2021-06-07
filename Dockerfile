@@ -1,19 +1,26 @@
-FROM python:3.8.3-alpine
+FROM python:3.6-onbuild
 
-# set work directory
-WORKDIR /usr/src/app
+WORKDIR /var/www/html
 
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# install psycopg2 dependencies
-RUN apk update && \
-    apk add postgresql-dev gcc python3-dev musl-dev && \
-    apk add git
+# Install dependencies
+RUN apt-get update && apt-get upgrade -y && apt-get autoclean
 
-RUN pip install --upgrade pip
-COPY ./requirements.txt /usr/src/app
-RUN pip install -r requirements.txt
+# install psycopg2 dependencies
+RUN apt-get install -y \
+    postgresql-dev gcc python3-dev musl-dev git \
+    g++ gcc libxml2-dev libxslt-dev \
+    libxslt \
+    python-psycopg2 \
+    libpq-dev \
+    python-opencv
+
+COPY ./requirements.txt /var/www/html
+
+RUN  pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
 # copy project
 COPY . .
