@@ -88,9 +88,6 @@ DATABASES = {
         'PASSWORD': os.environ.get('DIAGRAM_GURU_DATABASE_PASSWORD'),
         'HOST': os.environ.get('DIAGRAM_GURU_DATABASE_HOST'),
         'PORT': os.environ.get('DIAGRAM_GURU_DATABASE_PORT'),
-        'OPTIONS': {
-               'autocommit': True,
-        }
     }
 }
 
