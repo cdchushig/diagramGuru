@@ -7,28 +7,20 @@ diagramGuruTool is an analytical tool that evaluates diagrams according to diffe
 python manage.py runserver 8080
 ```
 
-Build the Docker image
+Docker commands
 ```
-docker build --tag django_diagram_guru:latest .
-```
-
-Create and run the Docker container
-```
-docker run --name django_diagram_guru -d -p 8000:8000 django_diagram_guru:latest
-``` 
-
-Utils commands
-```
-docker container ps
-docker-compose down -v
-chmod +x app/entrypoint.prod.sh
-```
-
-Start project
-```
-docker-compose -f docker-compose.prod.yml down -v
-docker-compose -f docker-compose.prod.yml up -d --build
-docker-compose -f docker-compose.prod.yml exec web python manage.py migrate --noinput
+docker-compose -f docker-compose.yml down -v
+docker-compose -f docker-compose.yml up -d --build
 docker-compose exec web python manage.py flush --no-input
+docker-compose exec web python manage.py collectstatic --no-input --clear
 docker-compose exec web python manage.py migrate
+docker-compose exec web python manage.py makemessages -l tr
+docker-compose exec web python manage.py compilemessages
+```
+
+Access to containers
+```
+$ docker run -d -p 3306:3306 --name drscratchv3_database -e MYSQL_ROOT_PASSWORD=password mysql
+$ docker exec -it <containerid> mysql -p
+$ docker exec -it <containerid> bash
 ```
