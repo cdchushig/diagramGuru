@@ -1,26 +1,30 @@
-FROM python:3.6-onbuild
+FROM python:3.7
 
-WORKDIR /var/www/html
+WORKDIR /var/www
+ADD . /var/www/
 
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV OPENCV_VERSION="4.0.1"
 
-# Install dependencies
-RUN apt-get update && apt-get upgrade -y && apt-get autoclean
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    git \
+    wget \
+    unzip \
+    yasm \
+    pkg-config \
+    libswscale-dev \
+    libtbb2 \
+    libtbb-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libopenjp2-7-dev \
+    libavformat-dev \
+    libpq-dev
 
-# install psycopg2 dependencies
-RUN apt-get install -y \
-    postgresql-dev gcc python3-dev musl-dev git \
-    g++ gcc libxml2-dev libxslt-dev \
-    libxslt \
-    python-psycopg2 \
-    libpq-dev \
-    python-opencv
+RUN pip install -r requirements.txt
 
-COPY ./requirements.txt /var/www/html
-
-RUN  pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-
-# copy project
-COPY . .
+# run entrypoint.sh
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
