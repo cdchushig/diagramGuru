@@ -26,5 +26,7 @@ RUN apt-get update && \
 
 RUN pip install -r requirements.txt
 
+RUN chmod +x entrypoint.sh
+
 # run entrypoint.sh
-ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+ENTRYPOINT ["/var/www/entrypoint.sh"]

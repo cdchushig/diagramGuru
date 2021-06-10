@@ -18,7 +18,8 @@ services:
       - POSTGRES_USER=${DIAGRAM_GURU_DATABASE_USER}
       - POSTGRES_PASSWORD=${DIAGRAM_GURU_DATABASE_PASSWORD}
       - POSTGRES_DB=${DIAGRAM_GURU_DATABASE_NAME}
-
+    ports:
+      - 5432:5432
 volumes:
   postgres_data:
   static_volume:
