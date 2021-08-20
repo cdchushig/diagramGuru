@@ -1,0 +1,27 @@
+---
+
+- name: ensure apt cache is up to date
+  apt: update_cache=yes
+
+- name: ensure packages are installed
+  apt:
+    name: "{{item}}"
+  with_items:
+    - postgresql
+    - libpq-dev
+    - python-psycopg2
+    - python3-dev
+    - python-dev
+
+- name: ensure database is created
+  become_user: postgres
+  postgresql_db:
+    name: diagramguru_db
+
+- name: ensure user has access to database
+  become_user: postgres
+  postgresql_user:
+    db: diagramguru_db
+    name: diagramguru_db
+    password: diagramguru_password
+    priv: ALL
