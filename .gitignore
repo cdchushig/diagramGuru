@@ -15,5 +15,6 @@ diagram_detector/flowchart_generator/results/*
 diagram_detector/text_model/output/iam/puigcerver/validation/*
 diagram_detector/text_model/images/Diagramas_pruebas_sin_preprocesamiento/*
 diagram_detector/results/*
+diagram_detector/dataset/*
 bpmn_python/images_input/*
 bpmn_python/images_output/*
