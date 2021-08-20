@@ -1,0 +1,19 @@
+---
+- hosts: all
+  become: yes
+
+  tasks:
+    - name: Install base packages
+      apt: name={{ item }} update_cache=yes state=installed
+      with_items:
+        - build-essential
+        - acl
+        - ntp
+        - htop
+        - git
+        - libpq-dev
+        - python-dev
+        - python-pip
+        - python-pycurl
+        - nginx
+        - gunicorn
