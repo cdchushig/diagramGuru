@@ -230,6 +230,10 @@ class Graph(object):
         *Check the cases arrow-rectangle/arrow line.
         """
         self.nodes = self.__collapse_nodes()
+
+        for node_complete in self.nodes:
+            print(node_complete)
+
         print("nodes", list(enumerate(self.nodes)))
         self.adj_list = {key: [] for key in range(len(self.nodes))}
         self.visited_list = [0]*len(self.nodes)

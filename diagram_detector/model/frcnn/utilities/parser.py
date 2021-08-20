@@ -27,9 +27,13 @@ class Parser(object):
 	def get_data(self, generate_annotate=False):
 		"""Parsing annotations files."""
 
-		if(generate_annotate):
+		if generate_annotate:
 			self.__generate_annotate()
-		# Open annotations file
+
+		print('....')
+		print(self.annotate_path)
+		print('....')
+
 		with open(self.annotate_path, 'r') as f:
 			print('Parsing annotation file...')
 			for line in f:
@@ -56,7 +60,7 @@ class Parser(object):
 		(filename, x1, y1, x2, y2, class_name, test) = line_split
 		test = (test == "1")
 
-		if(test == True):
+		if test == True:
 			filename = self.dataset_path + "/validation/images/" + filename
 		else:
 			filename = self.dataset_path + "/train/images/" + filename
@@ -123,7 +127,7 @@ class Parser(object):
 		"""Get data from validation or training folder of dataset (xml files)."""
 
 		# Check if it will get from validation or train
-		if(test):
+		if test:
 			type = 1
 			base_path = self.dataset_path + "/validation/"
 		else:
@@ -131,6 +135,10 @@ class Parser(object):
 			base_path = self.dataset_path + "/train/"
 
 		path_dataset = os.listdir(path)
+
+		print('****')
+		print(path)
+		print('****')
 
 		items_path = path + "/annots"
 		items = os.listdir(items_path)
@@ -159,14 +167,14 @@ class Parser(object):
 
 		return int(num)
 
+
 if __name__ == '__main__':
 	simple_parser = Parser(
-		dataset_path="/home/david/Escritorio/flowchart_3b_v3",
+		dataset_path="/home/cdchushig/multiverse/diagramGuru/diagram_detector/dataset/flowchart_3b_v3",
 		annotate_path="annotate.txt"
 	)
-	all_data, classes_count, class_mapping = simple_parser.get_data(
-		generate_annotate=True
-	)
+	all_data, classes_count, class_mapping = simple_parser.get_data(generate_annotate=True)
+
 	print(all_data)
 	print("-"*35)
 	print(classes_count)

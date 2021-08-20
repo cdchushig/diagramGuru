@@ -23,6 +23,7 @@ logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=lo
 def parse_arguments(parser):
     parser.add_argument('--id_model', type=int, default=63)
     parser.add_argument('--diagram_filename', type=str, default='test3.jpeg')
+    parser.add_argument('--display_image', type=bool, default=False)
     return parser.parse_args()
 
 
@@ -30,8 +31,8 @@ def detect_diagram_objects(diagram_path_filename, display_image):
     logging.info(diagram_path_filename)
 
     diagram_image = cv2.imread(diagram_path_filename)
-    path_trained_model = PATH_DIAGRAM_GURU_PROJECT + "/diagram_detector/model/training_results/8"
-    # path_trained_model = PATH_DIAGRAM_GURU_PROJECT + "/model/training_results/8"
+    # path_trained_model = PATH_DIAGRAM_GURU_PROJECT + "/diagram_detector/model/training_results/8"
+    path_trained_model = PATH_DIAGRAM_GURU_PROJECT + "/model/training_results/8"
 
     sc_classifier = ShapeClassifier(
         path_trained_model,
@@ -46,21 +47,20 @@ def detect_diagram_objects(diagram_path_filename, display_image):
     list_dict_nodes = []
     for shape_node in shape_nodes:
         list_dict_nodes.append(vars(shape_node))
+        print(shape_node)
 
     dict_objects = {}
     dict_objects['nodes'] = list_dict_nodes
-    print(dict_objects)
+    # print(dict_objects)
 
-    # return list_shape_nodes
+    tc = TextClassifier()
+    text_nodes_zip, text_nodes = tc.recognize(diagram_path_filename)
 
-    # tc = TextClassifier()
-    # text_nodes_zip, text_nodes = tc.recognize(diagram_path_filename)
-    #
-    # for text_diagram in text_nodes:
-    #     print(text_diagram)
-    #
-    # graph = Graph(text_nodes, shape_nodes)
-    # flow = graph.generate_graph()
+    for text_diagram in text_nodes:
+        print(text_diagram)
+
+    graph = Graph(text_nodes, shape_nodes)
+    flow = graph.generate_graph()
 
 
     # results_path = __get_results_path()
@@ -86,8 +86,9 @@ if __name__ == '__main__':
     args = parse_arguments(parser)
 
     diagram_path_filename = args.diagram_filename
-    # diagram_path_filename = PATH_DIAGRAM_UPLOADS + 'test3_2021_05_16_194610.jpg'
-    detect_diagram_objects(diagram_path_filename, display_image=False)
+    diagram_path_filename = PATH_DIAGRAM_UPLOADS + 'test4.png'
+
+    detect_diagram_objects(diagram_path_filename, display_image=True)
 
 
 # def __get_results_path():

@@ -11,6 +11,7 @@ import json
 from train import Trainer
 from report import Report
 
+
 class ShapeModel(object):
 	"""ShapeModel allows to start and manager the training and test process
 	in a deep learning arquitecture for object detection, such is Faster R-CNN.
@@ -63,7 +64,7 @@ class ShapeModel(object):
 		trainer.recover_data(
 			self.dataset_path,
 			annotate_path,
-			generate_annotate=True
+			generate_annotate=False
 		)
 		# Configure trainer
 		trainer.configure(

@@ -71,7 +71,7 @@ class Trainer(object):
 
 		sys.setrecursionlimit(40000)
 		logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
-		if(self.config.use_gpu):
+		if self.config.use_gpu:
 			config_gpu = tf.compat.v1.ConfigProto()
 			# dynamically grow the memory used on the GPU
 			config_gpu.gpu_options.allow_growth = True
@@ -118,6 +118,12 @@ class Trainer(object):
 		"""Recover data from annotate file or create annotate file from dataset.
 		"""
 		# Instance parser, recover data from annotate file or dataset
+
+		print('----')
+		print(dataset_path)
+		print(annotate_path)
+		print('----')
+
 		self.parser = Parser(
 			dataset_path=dataset_path,
 			annotate_path=annotate_path

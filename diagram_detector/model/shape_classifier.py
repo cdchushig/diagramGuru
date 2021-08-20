@@ -35,8 +35,8 @@ from .frcnn.utilities.image_tools import ImageTools
 
 dir_project = Path().resolve()
 PATH_DIAGRAM_GURU_PROJECT = str(dir_project)
-path_detector_model = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/model'
-# path_detector_model = PATH_DIAGRAM_GURU_PROJECT + '/model'
+# path_detector_model = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/model'
+path_detector_model = PATH_DIAGRAM_GURU_PROJECT + '/model'
 
 sys.path.append(path_detector_model)
 import frcnn

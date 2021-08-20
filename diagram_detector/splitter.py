@@ -3,12 +3,13 @@ import shutil
 import argparse
 from random import randint
 
-dataset_path = "/home/david/datasets/flowchart-3b"
-training_set_path = "/home/david/datasets/flowchart-3b(splitter)/train"
-validation_set_path = "/home/david/datasets/flowchart-3b(splitter)/validation"
-dataset_name = "/home/david/datasets/flowchart-3b(splitter)"
+dataset_path = "/home/cdchushig/multiverse/diagramGuru/diagram_detector/dataset/flowchart-3b"
+training_set_path = "/home/cdchushig/multiverse/diagramGuru/diagram_detector/dataset/flowchart-3b-splitter/train"
+validation_set_path = "/home/cdchushig/multiverse/diagramGuru/diagram_detector/dataset/flowchart-3b-splitter/validation"
+dataset_name = "/home/cdchushig/multiverse/diagramGuru/diagram_detector/dataset/flowchart-3b-splitter"
 split_tam = 80
 count = 0
+
 
 def create_dataset_splitter():
     os.mkdir(dataset_name)
@@ -41,8 +42,10 @@ def create_dataset_splitter():
     os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_right");os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_right/images");os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_right/annots")
     os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_down");os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_down/images");os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_down/annots")
     os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_left");os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_left/images");os.mkdir(dataset_name+"/validation"+"/arrow_rectangle_left/annots")
+
+
 def move_archive(images,annots,path,class_i):
-    print("[OK]",class_i)
+    print("[OK]", class_i)
     global count
     images = sorted(images)
     annots = sorted(annots)
@@ -67,6 +70,8 @@ def move_archive(images,annots,path,class_i):
         shutil.copy(path+"/annots/"+str(i),validation_set_path+"/"+class_i+"/annots/"+str(count_aux)+".xml")
         count_aux = count_aux + 1
     count = count_aux
+
+
 def generate():
     dataset = os.listdir(dataset_path)
     for class_i in dataset:
@@ -76,12 +81,14 @@ def generate():
             img_ann = sorted(img_ann)
             imgs = os.listdir(dataset_path+"/"+str(class_i)+"/"+str(background)+"/"+str(img_ann[1]))
             annts = os.listdir(dataset_path+"/"+str(class_i)+"/"+str(background)+"/"+str(img_ann[0]))
-            move_archive(imgs,annts,dataset_path+"/"+str(class_i)+"/"+str(background)+"/",class_i)
+            move_archive(imgs, annts, dataset_path+"/"+str(class_i)+"/"+str(background)+"/", class_i)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--split",type=int,default=80)
+    parser.add_argument("--split", type=int, default=80)
     args = parser.parse_args()
     split_tam = args.split
     create_dataset_splitter()
     generate()
-    print("Archives copy :",count*2)
+    print("Archives copy :", count*2)
