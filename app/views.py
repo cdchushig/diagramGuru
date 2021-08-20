@@ -23,6 +23,9 @@ from .models import Diagram
 from .serializers import DiagramSerializer
 from .app_consts import Consts
 
+from PIL import Image
+from pdf2image import convert_from_path, convert_from_bytes
+
 import networkx as nx
 
 from .diagram_node import DiagramNode
@@ -72,7 +75,10 @@ def do_cmd_to_shell_diagram_detector(diagram_path_filename):
 
     script_path_filename = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/detector_main.py'
 
-    cmd_diagram_detector = ["python", script_path_filename, "--diagram_filename", diagram_path_filename]
+    cmd_diagram_detector = ["python", script_path_filename,
+                            "--diagram_filename", diagram_path_filename,
+                            "--display_image", "True"]
+
     process = subprocess.Popen(cmd_diagram_detector, stdout=subprocess.PIPE, stderr=None)
     cmd_output = process.communicate()
 
@@ -101,6 +107,15 @@ def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_uniq
         print(response.text)
 
     return dict_objects
+
+
+def convert_upload_format_file_to_png(input_path, output_path, ext_file):
+
+    if ext_file in 'pdf':
+        img_file = convert_from_path(input_path + 'example.pdf')
+    elif ext_file in 'jpg':
+        img_file = Image.open(input_path + 'PhotoName' + ext_file)
+        img_file.save(output_path + 'PhotoName.png' + '.png')
 
 
 def save_file_uploaded(diagram_file_uploaded, diagram_path_filename_uploaded):
