@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 3rd party
-    'rest_framework',
+    # 'rest_framework',
     'bootstrap_modal_forms',
     'widget_tweaks',
     # Local
@@ -134,15 +134,15 @@ STATICFILES_DIRS = (
 
 STATIC_ROOT = '/static/'
 
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': [
+# REST_FRAMEWORK = {
+    # 'DEFAULT_RENDERER_CLASSES': [
         # 'rest_framework.renderers.XMLRenderer',
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.renderers.JSONRenderer',
+        # 'rest_framework.renderers.BrowsableAPIRenderer',
+    # ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
         # 'rest_framework.permissions.DjangoModelPermissions',
-        'rest_framework.permissions.AllowAny',
+        # 'rest_framework.permissions.AllowAny',
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
-}
+    # ]
+# }
