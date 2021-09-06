@@ -11,9 +11,9 @@ Vagrant.configure(API_VERSION) do |config|
     config.vm.network "private_network", ip: "192.168.33.10"
     config.vm.network "public_network"
 
-    config.vm.hostname = "vagrant-drscratchv3"
+    config.vm.hostname = "vagrant-diagramguru"
     config.ssh.forward_agent = true
-    config.vm.synced_folder "./", "/var/www/drscratchv3"
+    config.vm.synced_folder "./", "/var/www/diagramguru"
 
     config.vm.provision :ansible do |ansible|
         ansible.playbook = "ansible/vagrant.yml"

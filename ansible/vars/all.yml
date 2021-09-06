@@ -1,0 +1,7 @@
+code_repository_url: https://github.com/cdchushig/diagramGuru
+app_dir: /home/{{ deployer_user }}/{{app_name}}
+
+db_url: postgresql://{{deployer_user}}:{{db_password}}@localhost/{{app_name}}
+db_password: thisissomeseucrepassword
+db_name: "{{ app_name }}"
+db_user: "{{ deployer_user }}"

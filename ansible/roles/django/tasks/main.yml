@@ -14,10 +14,10 @@
     - supervisor
     - nginx
 
-- name: ensure git repo is present
+- name: clone and ensure git repo is present
   git:
-    repo: https://github.com/cdchushig/diagramGuru.git
-    dest: /opt/diagramguru
+    repo: {{ code_repository_url }}
+    dest: {{ app_dir }}
 
 - name: create virtualenv
   command: virtualenv /opt/venv -p python3.4 creates="/opt/venv"
