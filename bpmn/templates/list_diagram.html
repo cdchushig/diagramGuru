@@ -153,10 +153,10 @@ $(document).ready(function(){
             <table class="table table-striped table-hover table-bordered">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Name <i class="fa fa-sort"></i></th>
-                        <th>Author</th>
-                        <th>Country <i class="fa fa-sort"></i></th>
+                        <th>Name</th>
+                        <th>Author <i class="fa fa-sort"></i></th>
+                        <th>Comment</th>
+                        <th>Creation Date <i class="fa fa-sort"></i></th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -166,11 +166,10 @@ $(document).ready(function(){
                             <td>{{ bpmn.name }}</td>
                             <td>{{ bpmn.author }}</td>
                             <td>{{ bpmn.comment }}</td>
-                            <td>{{ bpmn.country }}</td>
-<!--                            <td><a class="btn btn-danger" href="/bpmn/delete_bpmn/{{ bpmn.id }}/">Exclude</a></td>-->
+                            <td>{{ bpmn.creation_date }}</td>
                             <td>
                                 <a href="#" class="view" title="View" data-toggle="tooltip"><i class="material-icons">&#xE417;</i></a>
-                                <a href="/bpmn/open_bpmn/{{ bpmn.id }}/" class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
+                                <a href="/bpmn/open_diagram/{{ bpmn.id }}/" class="edit" title="Edit" data-toggle="tooltip"><i class="material-icons">&#xE254;</i></a>
                                 <a href="#" class="delete" title="Delete" data-toggle="tooltip"><i class="material-icons">&#xE872;</i></a>
                             </td>
                         </tr>
