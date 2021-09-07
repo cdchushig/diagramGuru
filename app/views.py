@@ -31,11 +31,8 @@ import networkx as nx
 from .diagram_node import DiagramNode
 from app.diagram_utils import compute_distance_between_nodes
 
-from bpmn_python.bpmn_python.bpmn_diagram_layouter import generate_layout
-from bpmn_python.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
-
-import logging
-logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+from bpmn_python_lib.bpmn_python.bpmn_diagram_layouter import generate_layout
+from bpmn_python_lib.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
 
 DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
@@ -44,12 +41,18 @@ PATH_DIR_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
 
 list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
 
+import logging
+import coloredlogs
+# logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
+logger = logging.getLogger(__name__)
+coloredlogs.install(level='DEBUG', logger=logger)
+
 
 def index_app(request):
     return render(request, 'index2.html')
 
 
-def show_dashboard(request):
+def show_modeler(request):
     """
     Handle Request POST with uploded file
     :param request: Request object.
@@ -60,7 +63,7 @@ def show_dashboard(request):
         if upload_file_form.is_valid():
             diagram_name_unique_id = handle_uploaded_file(request.FILES['diagram_file'])
             request.session['diagram_name'] = diagram_name_unique_id
-            return HttpResponseRedirect('/bpmn/open_external_bpmn')
+            return HttpResponseRedirect('/bpmn/open_external_diagram')
     else:
         return HttpResponseRedirect('/')
 
@@ -71,7 +74,7 @@ def do_cmd_to_shell_diagram_detector(diagram_path_filename):
     :param diagram_path_filename: String object.
     :return: dict_objects. Dictionary object. Dictionary with diagram objects.
     """
-    logging.info("do_cmd_to_shell_diagram_detector")
+    logger.info("do_cmd_to_shell_diagram_detector")
 
     script_path_filename = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/detector_main.py'
 
@@ -83,8 +86,12 @@ def do_cmd_to_shell_diagram_detector(diagram_path_filename):
     cmd_output = process.communicate()
 
     dict_objects_str = cmd_output[0].decode("utf-8")
-    dict_objects_str = str(dict_objects_str).replace("'", '"')
-    dict_objects = eval(dict_objects_str)
+
+    if dict_objects_str and dict_objects_str.strip():
+        dict_objects_str = str(dict_objects_str).replace("'", '"')
+        dict_objects = eval(dict_objects_str)
+    else:
+        dict_objects = {}
 
     return dict_objects
 
@@ -104,7 +111,7 @@ def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_uniq
     try:
         dict_objects = response.json()
     except requests.exceptions.RequestException:
-        print(response.text)
+        logger.error(response.text)
 
     return dict_objects
 
@@ -144,14 +151,15 @@ def get_filename_unique_id_and_ext(diagram_filename_with_extension):
 
 
 def handle_uploaded_file(diagram_file_uploaded):
-    diagram_filename_with_extension = diagram_file_uploaded.name
-    diagram_filename_unique_id, ext_file = get_filename_unique_id_and_ext(diagram_filename_with_extension)
+    diagram_filename_unique_id, ext_file = get_filename_unique_id_and_ext(diagram_file_uploaded.name)
     diagram_path_filename_unique_id = PATH_DIR_UPLOADS + diagram_filename_unique_id + ext_file
     save_file_uploaded(diagram_file_uploaded, diagram_path_filename_unique_id)
 
     dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
-    diagram_graph = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
-    transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id)
+
+    if dict_diagram_objects:
+        diagram_graph = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
+        transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id)
 
     return diagram_filename_unique_id
 
@@ -159,15 +167,15 @@ def handle_uploaded_file(diagram_file_uploaded):
 def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
     # list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
     type_diagram_element = diagram_node.get_type()
-    print(type_diagram_element)
+    logger.info(type_diagram_element)
     letters = string.ascii_lowercase
     text_element = ''.join(random.choice(letters) for i in range(5))
     if type_diagram_element == 'start_end':
         return bpmn_graph.add_start_event_to_diagram(process_id, start_event_name=text_element)
     elif type_diagram_element == 'scan':
-        return bpmn_graph.add_task_to_diagram(process_id, task_name=text_element)
+        return bpmn_graph.add_task_to_diagram(process_id, pos_x=200, pos_y=200, task_name=text_element)
     elif type_diagram_element == 'process':
-        return bpmn_graph.add_task_to_diagram(process_id, task_name=text_element)
+        return bpmn_graph.add_task_to_diagram(process_id, pos_x=400, pos_y=400, task_name=text_element)
     elif type_diagram_element == 'decision':
         return bpmn_graph.add_parallel_gateway_to_diagram(process_id, text_element)
 
@@ -179,7 +187,7 @@ def create_graph_from_list_nodes(dict_objects, verbose=0):
     :param dict_objects:
     :return:
     """
-    logging.info("create_graph_from_list_nodes")
+    logger.info("create_graph_from_list_nodes")
 
     list_diagram_nodes = []
     diagram_graph = nx.Graph()
@@ -279,7 +287,7 @@ def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id):
     :param diagram_filename_unique_id: string object.
     :return:
     """
-    logging.info("transform_graph_to_bpmn")
+    logger.info("transform_graph_to_bpmn")
 
     bpmn_graph = BpmnE2DiagramGraph()
     bpmn_graph.create_new_diagram_graph(diagram_name="diagram1")
