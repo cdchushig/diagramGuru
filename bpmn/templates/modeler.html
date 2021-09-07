@@ -81,7 +81,8 @@
       var isNewDiagram = false
 
       // the file name to be opened
-      var diagramUrl = '{{bpmn_filename}}';
+      // var diagramUrl = '{{bpmn_filename}}';
+      var diagramUrl = "{% static 'bpmn/diagrams/blank_diagram.bpmn' %}"
       {% autoescape off %}
         var bpmnFileContent = "{{ bpmn_file_content|escapejs }}"
       {% endautoescape %}
@@ -181,13 +182,13 @@
       });
 
       // $("#create-diagram").modalForm({
-      //   formURL: "{% url 'create_bpmn' %}",
+      //   formURL: "{% url 'create_diagram' %}",
       //   modalID: "#create-modal"
       // });
 
       function createDiagramSyncModalForm() {
         $("#create-diagram-sync").modalForm({
-            formURL: "{% url 'create_bpmn' %}",
+            formURL: "{% url 'create_diagram' %}",
             modalID: "#create-modal"
         });
       }
