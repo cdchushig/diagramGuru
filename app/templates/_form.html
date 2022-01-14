@@ -24,7 +24,7 @@
                     <h5 class="dark-text form-heading"><strong>{% trans "There is a option to analyze your diagram now!" %}</strong></h5>
 
                     <div id="drop-area">
-                    <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/show_modeler">
+                    <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/#">
                         {% csrf_token %}
                         {% trans "Please, if you have a diagram in the computer, you can analyze it here:" %}
                         <input  name='diagram_file' type='file' class='filestyle' data-buttonText='Choose Diagram'>
@@ -34,11 +34,11 @@
                     </div>
 
                     <p class="file-error dark-text small-text">
-                    {% trans "Error! Please choose a .sb or .sb2 file or input an url" %}</p>
+                    {% trans "Error! Please choose a .jpg or .png file" %}</p>
 
                     {% if error %}
                         <br/>
-                        <p><span class="icon icon-close-alt2"></span> {% trans "Error! Please choose a .sb or .sb2 file or input an url" %}</p>
+                        <p><span class="icon icon-close-alt2"></span> {% trans "Error! Please choose a .jpg or .png file" %}</p>
                     {% endif %}
 
                 </div>
@@ -67,13 +67,6 @@
             <img src="static/app/img/logo_jyu.jpeg" alt="">
             </a>
         </li>
-
-        <li>
-            <a href="http://www.fecyt.es">
-            <img src="static/app/img/logoFECYT.jpg" alt="">
-            </a>
-        </li>
-
     </ul>
 </div>
 </section>
