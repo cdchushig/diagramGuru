@@ -53,6 +53,7 @@ def modeler(request):
 
 
 def list_diagram(request):
+    logger.info('List diagrams')
     list_diagram = Diagram.objects.all()
     context = {"bpmn_list": list_diagram}
     template = 'list_diagram.html'
@@ -113,13 +114,13 @@ def open_diagram(request, id):
 
 
 def open_external_diagram(request):
-    logger.info(request.session.get('diagram_name'))
-
     bpmn_filename_xml = request.session.get('diagram_name')
     bpmn_path_filename_xml = PATH_DIAGRAM_GURU_DIAGRAMS + bpmn_filename_xml + '.xml'
     tree = etree.parse(bpmn_path_filename_xml)
     xml_str = etree.tostring(tree.getroot())
     context = {'bpmn_file_content': xml_str, 'id_bpmn': 1}
+
+    logger.info('Loaded xml file: %s', request.session.get('diagram_name'))
 
     return render(request, 'modeler.html', context)
 

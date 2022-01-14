@@ -13,6 +13,7 @@ import string
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.contrib.auth import authenticate, login
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -27,10 +28,13 @@ from PIL import Image
 from pdf2image import convert_from_path, convert_from_bytes
 
 import networkx as nx
+from xml.etree.ElementTree import tostring
+from xml.etree.ElementTree import ElementTree
 
 from .diagram_node import DiagramNode
 from app.diagram_utils import compute_distance_between_nodes
 
+from bpmn_python_lib.bpmn_python.bpmn_diagram_export import BpmnDiagramGraphExport
 from bpmn_python_lib.bpmn_python.bpmn_diagram_layouter import generate_layout
 from bpmn_python_lib.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
 
@@ -49,6 +53,14 @@ coloredlogs.install(level='DEBUG', logger=logger)
 
 
 def index_app(request):
+    # username = request.POST['username']
+    # password = request.POST['password']
+    # user = authenticate(request, username=username, password=password)
+    # if user is not None:
+    #     login(request, user)
+    #     return render(request, 'index2.html')
+    # else:
+    #     return render(request, 'index2.html')
     return render(request, 'index2.html')
 
 
@@ -127,7 +139,7 @@ def convert_upload_format_file_to_png(input_path, output_path, ext_file):
 
 def save_file_uploaded(diagram_file_uploaded, diagram_path_filename_uploaded):
     """
-    Save diagram file upload to local folder.
+    Save diagram file to local folder.
     :param diagram_file_uploaded:
     :param diagram_path_filename_uploaded:
     :return:
@@ -160,6 +172,8 @@ def handle_uploaded_file(diagram_file_uploaded):
     if dict_diagram_objects:
         diagram_graph = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
         transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id)
+    else:
+        logger.error('No diagram objects recognized!')
 
     return diagram_filename_unique_id
 
@@ -167,17 +181,31 @@ def handle_uploaded_file(diagram_file_uploaded):
 def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
     # list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
     type_diagram_element = diagram_node.get_type()
-    logger.info(type_diagram_element)
-    letters = string.ascii_lowercase
-    text_element = ''.join(random.choice(letters) for i in range(5))
+    logger.info('Added diagram object: %s', type_diagram_element)
+    text_element = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+
     if type_diagram_element == 'start_end':
         return bpmn_graph.add_start_event_to_diagram(process_id, start_event_name=text_element)
     elif type_diagram_element == 'scan':
-        return bpmn_graph.add_task_to_diagram(process_id, pos_x=200, pos_y=200, task_name=text_element)
+        return bpmn_graph.add_task_to_diagram(process_id,
+                                              pos_x=diagram_node.compute_centers()[0],
+                                              pos_y=diagram_node.compute_centers()[1],
+                                              task_name=text_element)
     elif type_diagram_element == 'process':
-        return bpmn_graph.add_task_to_diagram(process_id, pos_x=400, pos_y=400, task_name=text_element)
+        return bpmn_graph.add_task_to_diagram(process_id,
+                                              pos_x=diagram_node.compute_centers()[0],
+                                              pos_y=diagram_node.compute_centers()[1],
+                                              task_name=text_element)
     elif type_diagram_element == 'decision':
-        return bpmn_graph.add_parallel_gateway_to_diagram(process_id, text_element)
+        return bpmn_graph.add_parallel_gateway_to_diagram(process_id,
+                                                          pos_x=diagram_node.compute_centers()[0],
+                                                          pos_y=diagram_node.compute_centers()[1],
+                                                          gateway_name='')
+    else:
+        return bpmn_graph.add_task_to_diagram(process_id,
+                                              pos_x=diagram_node.compute_centers()[0],
+                                              pos_y=diagram_node.compute_centers()[1],
+                                              task_name=text_element)
 
 
 def create_graph_from_list_nodes(dict_objects, verbose=0):
@@ -200,10 +228,17 @@ def create_graph_from_list_nodes(dict_objects, verbose=0):
     for node_item in list_diagram_nodes_ordered:
         diagram_graph.add_node(node_item.id, data=node_item)
         if verbose:
-            print(node_item)
+            logger.info('DiagramNode item: %s', node_item)
 
     dict_connected_nodes = build_dictionary_with_connected_nodes(diagram_graph)
     list_tuples_connected_nodes = build_list_tuples_connected_nodes(dict_connected_nodes, diagram_graph)
+
+    print('-h--')
+    print(dict_connected_nodes)
+    print(list_tuples_connected_nodes)
+    print(diagram_graph.nodes())
+    print('-h--')
+
     # diagram_graph = update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes)
 
     for tuple_node in list_tuples_connected_nodes:
@@ -239,7 +274,7 @@ def build_dictionary_with_connected_nodes(diagram_graph):
 
 def build_list_tuples_connected_nodes(dict_tuples_nodes, diagram_graph):
     """
-    Build list of tuples of nodes which are connected according to distance
+    Build list of tuples of nodes which are connected based on a minimum distance
     :param dict_tuples_nodes:
     :param diagram_graph:
     :return:
@@ -280,27 +315,30 @@ def order_nodes_by_center_positions(list_nodes):
     return list_nodes_sorted_filtered
 
 
-def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id):
+def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id, diagram_name='diagram1'):
     """
-    Build a BPMN file with a dictionary of elements linked to a diagram
+    Build a BPMN file (.bpmn or .xml) with a dictionary of elements linked to a diagram
     :param diagram_graph: DiagramGraph object.
     :param diagram_filename_unique_id: string object.
+    :param diagram_name: string object.
     :return:
     """
     logger.info("transform_graph_to_bpmn")
 
     bpmn_graph = BpmnE2DiagramGraph()
-    bpmn_graph.create_new_diagram_graph(diagram_name="diagram1")
+    bpmn_graph.create_new_diagram_graph(diagram_name=diagram_name)
     process_id = bpmn_graph.add_process_to_diagram()
 
     m_adj = nx.adjacency_matrix(diagram_graph)
     m_adj_dense = m_adj.todense()
 
+    print(m_adj)
     print(m_adj_dense)
-    print(type(m_adj_dense))
+    print(diagram_graph.edges)
 
     task_id_src = 1000
     task_id_dst = 1000
+
     for count, tuple_connected_nodes in enumerate(diagram_graph.edges):
         if count == 0:
             [task1_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[0]]['data'],
@@ -321,10 +359,25 @@ def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id):
         bpmn_graph.add_sequence_flow_to_diagram(process_id, task_id_src, task_id_dst, "")
         task_id_src = task2_id
 
-    for (u, v) in diagram_graph.edges:
-        print(f"({u}, {v})")
+    # for (u, v) in diagram_graph.edges:
+    #     print(f"({u}, {v})")
 
     generate_layout(bpmn_graph)
+
+    tree = BpmnDiagramGraphExport.export_xml_etree(bpmn_graph)
+    tree = tree.getroot()
+
+    # for item in tree.iter():
+    #     print(item)
+
+    for elem in tree.findall(".//*[@bpmnElement]"):
+        # elem.attrib["ID"] = "0"
+        for child in elem.iter():
+            print(child.attrib)
+            print(type(child.attrib))
+
+    xml_str = tostring(tree)
+
     bpmn_graph.export_xml_file(PATH_DIR_DIAGRAMS, diagram_filename_unique_id + '.xml')
 
 

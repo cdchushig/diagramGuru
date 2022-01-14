@@ -4,10 +4,10 @@ class DiagramNode(object):
     def __init__(self, id, coords, type, text):
         super(DiagramNode, self).__init__()
         self.id = id
-        self.coords = coords
         self.type = type
+        self.coords = coords
         self.text = text
-        self.centers = self.compute_center_of_node()
+        self.centers = self.compute_centers()
 
     def get_coords(self):
         return self.coords
@@ -21,7 +21,7 @@ class DiagramNode(object):
     def get_text(self):
         return self.text
 
-    def compute_center_of_node(self):
+    def compute_centers(self):
         cx = int((self.coords[0] + self.coords[1]) / 2)
         cy = int((self.coords[2] + self.coords[3]) / 2)
         return [cx, cy]
