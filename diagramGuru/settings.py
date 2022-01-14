@@ -31,7 +31,6 @@ DEBUG = os.environ.get('DIAGRAM_GURU_DEBUG', False)
 
 ALLOWED_HOSTS = os.environ.get('DIAGRAM_GURU_ALLOWED_HOSTS').split(",")
 
-
 # Application definition
 
 INSTALLED_APPS = [
