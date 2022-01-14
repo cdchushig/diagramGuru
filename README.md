@@ -47,7 +47,6 @@ $ docker exec -it <containerid> mysql -p
 $ docker exec -it <containerid> bash
 ```
 
-
 ### Create image annotations
 
 To improve the model, other images can be used in the training process. To get images for training and
