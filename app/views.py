@@ -34,9 +34,9 @@ from xml.etree.ElementTree import ElementTree
 from .diagram_node import DiagramNode
 from app.diagram_utils import compute_distance_between_nodes
 
-from bpmn_python_lib.bpmn_python.bpmn_diagram_export import BpmnDiagramGraphExport
-from bpmn_python_lib.bpmn_python.bpmn_diagram_layouter import generate_layout
-from bpmn_python_lib.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
+from bpmn_python_lib2.bpmn_python.bpmn_diagram_export import BpmnDiagramGraphExport
+from bpmn_python_lib2.bpmn_python.bpmn_diagram_layouter import generate_layout
+from bpmn_python_lib2.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
 
 DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))

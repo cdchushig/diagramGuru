@@ -16,5 +16,5 @@ diagram_detector/text_model/output/iam/puigcerver/validation/*
 diagram_detector/text_model/images/Diagramas_pruebas_sin_preprocesamiento/*
 diagram_detector/results/*
 diagram_detector/dataset/*
-bpmn_python_lib/images_input/*
-bpmn_python_lib/images_output/*
+bpmn_python_lib2/images_input/*
+bpmn_python_lib2/images_output/*
