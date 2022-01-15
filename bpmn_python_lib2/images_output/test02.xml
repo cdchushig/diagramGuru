@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='utf-8'?>
+<definitions expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <bpmndi:BPMNDiagram id="id620510aa-8b6e-4475-a896-37a3b0cb2f37" name="diagram1">
+    <bpmndi:BPMNPlane bpmnElement="id1ee6e764-2e7a-409c-9238-b565bcecf9be" id="id1666f77c-aa35-470c-a2a5-1751bf2641c8">
+      <bpmndi:BPMNShape bpmnElement="id005885b6-9256-4fc3-a063-0f000fbb3103" id="id005885b6-9256-4fc3-a063-0f000fbb3103_gui">
+        <omgdc:Bounds height="120" width="120" x="1968" y="2025" />
+      </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="ide01df715-df80-4a07-8825-13b55ca086c6" id="ide01df715-df80-4a07-8825-13b55ca086c6_gui">
+        <omgdc:Bounds height="120" width="120" x="1703" y="2366" />
+      </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="id833c2f9d-0a02-4d76-b070-dd4b7ce60c7d" id="id833c2f9d-0a02-4d76-b070-dd4b7ce60c7d_gui">
+        <omgdc:Bounds height="120" width="120" x="2423" y="2612" />
+      </bpmndi:BPMNShape>
+    <bpmndi:BPMNShape bpmnElement="id20e4310d-2cd9-48bd-a0f8-4c4a68c72f93" id="id20e4310d-2cd9-48bd-a0f8-4c4a68c72f93_gui">
+        <omgdc:Bounds height="120" width="120" x="1719" y="2202" />
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+<process id="id1ee6e764-2e7a-409c-9238-b565bcecf9be" isClosed="false" isExecutable="false" processType="None">
+    <startEvent id="id005885b6-9256-4fc3-a063-0f000fbb3103" isInterrupting="true" name="start_event" parallelMultiple="false" />
+  <task id="ide01df715-df80-4a07-8825-13b55ca086c6" name="task1" />
+  <task id="id833c2f9d-0a02-4d76-b070-dd4b7ce60c7d" name="task2" />
+  <endEvent id="id20e4310d-2cd9-48bd-a0f8-4c4a68c72f93" name="end_event" />
+  </process>
+</definitions>
