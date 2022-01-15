@@ -60,7 +60,7 @@ matplotlib==3.2.1
 murmurhash==1.0.5
 mysqlclient==2.1.0
 networkx==2.1
-#nl-description-to-bpmn @ file:///home/cdchushig/multiverse/nl-description-to-bpmn
+nl-description-to-bpmn @ file:///home/cdchushig/multiverse/nl-description-to-bpmn
 nltk==3.5
 numba==0.47.0
 numpy==1.18.1

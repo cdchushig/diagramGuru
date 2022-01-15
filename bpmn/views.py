@@ -14,7 +14,7 @@ from .forms import DiagramModelForm
 
 import logging
 import coloredlogs
-from lxml import etree
+# from lxml import etree
 from xml.etree import ElementTree
 
 from io import StringIO, BytesIO
