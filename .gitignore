@@ -11,7 +11,8 @@ db.sqlite3
 uploads/*.png
 uploads/*.jpg
 uploads/*.jpeg
-diagrams/
+diagrams/*.xml
+diagrams/*.bpmn
 diagram_detector/flowchart_generator/test_cases/*
 diagram_detector/flowchart_generator/results/*
 diagram_detector/text_model/output/iam/puigcerver/validation/*
