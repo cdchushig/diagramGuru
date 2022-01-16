@@ -24,7 +24,7 @@
                     <h5 class="dark-text form-heading"><strong>{% trans "There is a option to analyze your diagram now!" %}</strong></h5>
 
                     <div id="drop-area">
-                    <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/#">
+                    <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/show_modeler">
                         {% csrf_token %}
                         {% trans "Please, if you have a diagram in the computer, you can analyze it here:" %}
                         <input  name='diagram_file' type='file' class='filestyle' data-buttonText='Choose Diagram'>
