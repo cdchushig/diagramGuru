@@ -8,7 +8,9 @@ db.sqlite3
 *.jpg
 *.jpeg
 *.png
-uploads/
+uploads/*.png
+uploads/*.jpg
+uploads/*.jpeg
 diagrams/
 diagram_detector/flowchart_generator/test_cases/*
 diagram_detector/flowchart_generator/results/*
