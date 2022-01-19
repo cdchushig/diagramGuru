@@ -145,3 +145,10 @@ STATIC_ROOT = '/static/'
         # 'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     # ]
 # }
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'diagram_guru@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_password'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+

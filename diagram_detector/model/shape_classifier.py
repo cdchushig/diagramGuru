@@ -38,6 +38,10 @@ PATH_DIAGRAM_GURU_PROJECT = str(dir_project)
 path_detector_model = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/model'
 # path_detector_model = PATH_DIAGRAM_GURU_PROJECT + '/model'
 
+print('----')
+print(path_detector_model)
+print('----')
+
 sys.path.append(path_detector_model)
 import frcnn
 
@@ -169,6 +173,8 @@ class ShapeClassifier(object):
 		"""
 
         config_path = results_path + "/config.pickle"
+        print('holi')
+        print(config_path)
         try:
             objects = []
             with (open(config_path, 'rb')) as f_in:
@@ -236,6 +242,9 @@ class ShapeClassifier(object):
 
         model_path = path_detector_model + "/" + self.config.weights_output_path
         # model_path = "model/" + self.config.weights_output_path
+
+        print('bye')
+        print(model_path)
 
         try:
             # print('Loading weights from {}'.format(model_path))
