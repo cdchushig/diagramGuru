@@ -5,15 +5,19 @@ import base64
 import json
 import requests
 import subprocess
+import numpy as np
 import itertools as it
 import operator
 
 import random
 import string
+from bs4 import BeautifulSoup
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render
 from django.contrib.auth import authenticate, login
+
+from django.contrib.auth.forms import UserCreationForm
+from django.shortcuts import render, redirect
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -30,6 +34,7 @@ from pdf2image import convert_from_path, convert_from_bytes
 import networkx as nx
 from xml.etree.ElementTree import tostring
 from xml.etree.ElementTree import ElementTree
+import cv2
 
 from .diagram_node import DiagramNode
 from app.diagram_utils import compute_distance_between_nodes
@@ -38,10 +43,16 @@ from bpmn_python_lib2.bpmn_python.bpmn_diagram_export import BpmnDiagramGraphExp
 from bpmn_python_lib2.bpmn_python.bpmn_diagram_layouter import generate_layout
 from bpmn_python_lib2.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
 
+from lxml import etree
+
 DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
 PATH_DIR_UPLOADS = PATH_DIAGRAM_GURU_PROJECT + "/uploads/"
 PATH_DIR_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
+
+BPMN_MODEL_NS = 'http://www.omg.org/spec/BPMN/20100524/MODEL'
+DIAG_INTERCHANGE_NS = "http://www.omg.org/spec/BPMN/20100524/DI"
+DIAG_COMMON_NS = "http://www.omg.org/spec/DD/20100524/DC"
 
 list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
 
@@ -64,6 +75,38 @@ def index_app(request):
     return render(request, 'index2.html')
 
 
+def show_dashboard(request):
+    return render(request, "dashboard.html", context={})
+
+
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username = form.cleaned_data.get('username')
+            raw_password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/')
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {'form': form})
+
+
+def xpath_eval(node, extra_ns=None):
+    """
+    Returns an XPathEvaluator, with namespace prefixes 'bpmn' for
+    http://www.omg.org/spec/BPMN/20100524/MODEL, and additional specified ones
+    """
+    namespaces = {'bpmn': BPMN_MODEL_NS,
+                  'dc': DIAG_COMMON_NS,
+                  'bpmndi': DIAG_INTERCHANGE_NS}
+    if extra_ns:
+        namespaces.update(extra_ns)
+    return lambda path: node.findall(path, namespaces)
+
+
 def show_modeler(request):
     """
     Handle Request POST with uploded file
@@ -80,32 +123,9 @@ def show_modeler(request):
         return HttpResponseRedirect('/')
 
 
-def do_cmd_to_shell_diagram_detector(diagram_path_filename):
-    """
-    Execute a cmd command and return output string
-    :param diagram_path_filename: String object.
-    :return: dict_objects. Dictionary object. Dictionary with diagram objects.
-    """
-    logger.info("do_cmd_to_shell_diagram_detector")
-
-    script_path_filename = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/detector_main.py'
-
-    cmd_diagram_detector = ["python", script_path_filename,
-                            "--diagram_filename", diagram_path_filename,
-                            "--display_image", "True"]
-
-    process = subprocess.Popen(cmd_diagram_detector, stdout=subprocess.PIPE, stderr=None)
-    cmd_output = process.communicate()
-
-    dict_objects_str = cmd_output[0].decode("utf-8")
-
-    if dict_objects_str and dict_objects_str.strip():
-        dict_objects_str = str(dict_objects_str).replace("'", '"')
-        dict_objects = eval(dict_objects_str)
-    else:
-        dict_objects = {}
-
-    return dict_objects
+def handle_404(request):
+    data = {}
+    return render(request, 'error.html', data)
 
 
 def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_unique_id_with_extension):
@@ -122,7 +142,9 @@ def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_uniq
 
     try:
         dict_objects = response.json()
+        # logger.info(dict_objects)
     except requests.exceptions.RequestException:
+        logger.error('Error in response from api')
         logger.error(response.text)
 
     return dict_objects
@@ -167,13 +189,19 @@ def handle_uploaded_file(diagram_file_uploaded):
     diagram_path_filename_unique_id = PATH_DIR_UPLOADS + diagram_filename_unique_id + ext_file
     save_file_uploaded(diagram_file_uploaded, diagram_path_filename_unique_id)
 
-    dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
+    # dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
+
+    diagram_img = cv2.imread(diagram_path_filename_unique_id)
+    is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img)
+    img_bytes = im_buf_arr.tobytes()
+
+    dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, diagram_path_filename_unique_id)
 
     if dict_diagram_objects:
-        diagram_graph = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
-        transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id)
+        diagram_graph, list_diagram_nodes_ordered = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
+        transform_graph_to_bpmn(diagram_graph, list_diagram_nodes_ordered, diagram_filename_unique_id)
     else:
-        logger.error('No diagram objects recognized!')
+        logger.error('No objects in diagram recognized!')
 
     return diagram_filename_unique_id
 
@@ -213,7 +241,7 @@ def create_graph_from_list_nodes(dict_objects, verbose=0):
     Create a DiagramGraph object with diagram objects (nodes)
     :param verbose:
     :param dict_objects:
-    :return:
+    :return: diagram_graph
     """
     logger.info("create_graph_from_list_nodes")
 
@@ -233,18 +261,12 @@ def create_graph_from_list_nodes(dict_objects, verbose=0):
     dict_connected_nodes = build_dictionary_with_connected_nodes(diagram_graph)
     list_tuples_connected_nodes = build_list_tuples_connected_nodes(dict_connected_nodes, diagram_graph)
 
-    print('-h--')
-    print(dict_connected_nodes)
-    print(list_tuples_connected_nodes)
-    print(diagram_graph.nodes())
-    print('-h--')
-
     # diagram_graph = update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes)
 
     for tuple_node in list_tuples_connected_nodes:
         diagram_graph.add_edge(tuple_node[0], tuple_node[1])
 
-    return diagram_graph
+    return diagram_graph, list_diagram_nodes_ordered
 
 
 # def update_diagram_graph_with_edges(diagram_graph, list_tuples_connected_nodes):
@@ -310,12 +332,23 @@ def order_nodes_by_center_positions(list_nodes):
     :param list_nodes: List of DiagramNode.
     :return:
     """
-    list_nodes_sorted = sorted(list_nodes, key=lambda x: [x.centers[1], x.centers[0]])
+    list_nodes_sorted = sorted(list_nodes, key=lambda x: [x.y, x.x])
     list_nodes_sorted_filtered = list(filter(lambda x: x.type in list_diagram_types_allowed, list_nodes_sorted))
+
     return list_nodes_sorted_filtered
 
 
-def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id, diagram_name='diagram1'):
+def stringify_children(node):
+    from lxml.etree import tostring
+    from itertools import chain
+    parts = ([node.text] +
+            list(chain(*([c.text, tostring(c), c.tail] for c in node.getchildren()))) +
+            [node.tail])
+    # filter removes possible Nones in texts and tails
+    return ''.join(filter(None, parts))
+
+
+def transform_graph_to_bpmn(diagram_graph, list_diagram_nodes, diagram_filename_unique_id, diagram_name='diagram1'):
     """
     Build a BPMN file (.bpmn or .xml) with a dictionary of elements linked to a diagram
     :param diagram_graph: DiagramGraph object.
@@ -332,53 +365,48 @@ def transform_graph_to_bpmn(diagram_graph, diagram_filename_unique_id, diagram_n
     m_adj = nx.adjacency_matrix(diagram_graph)
     m_adj_dense = m_adj.todense()
 
-    print(m_adj)
-    print(m_adj_dense)
-    print(diagram_graph.edges)
-
     task_id_src = 1000
     task_id_dst = 1000
 
-    for count, tuple_connected_nodes in enumerate(diagram_graph.edges):
-        if count == 0:
-            [task1_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[0]]['data'],
-                                                      process_id,
-                                                      bpmn_graph)
+    list_aux = []
 
-            [task2_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[1]]['data'],
-                                                      process_id,
-                                                      bpmn_graph)
-            task_id_src = task1_id
-            task_id_dst = task2_id
-        else:
-            [task2_id, _] = create_bpmn_graph_element(diagram_graph.node[tuple_connected_nodes[1]]['data'],
-                                                      process_id,
-                                                      bpmn_graph)
-            task_id_dst = task2_id
+    for diagram_node in list_diagram_nodes:
+        print('x', diagram_node)
+        [task1_id, _] = create_bpmn_graph_element(diagram_node,
+                                                  process_id,
+                                                  bpmn_graph)
 
-        bpmn_graph.add_sequence_flow_to_diagram(process_id, task_id_src, task_id_dst, "")
-        task_id_src = task2_id
-
-    # for (u, v) in diagram_graph.edges:
-    #     print(f"({u}, {v})")
+        diagram_node.set_idbpmn(task1_id)
+        list_aux.append(diagram_node)
 
     generate_layout(bpmn_graph)
 
     tree = BpmnDiagramGraphExport.export_xml_etree(bpmn_graph)
-    tree = tree.getroot()
+    xml_str = tostring(tree.getroot())
+    root = etree.fromstring(xml_str)
+    namespaces = root.nsmap
 
-    # for item in tree.iter():
-    #     print(item)
+    # Remove all arrows
+    for edge in root.findall(".//bpmndi:BPMNEdge", namespaces):
+        edge.getparent().remove(edge)
 
-    for elem in tree.findall(".//*[@bpmnElement]"):
-        # elem.attrib["ID"] = "0"
-        for child in elem.iter():
-            print(child.attrib)
-            print(type(child.attrib))
+    [print(node) for node in list_diagram_nodes]
+    [print(node.attrib['bpmnElement']) for node in root.findall(".//bpmndi:BPMNShape", namespaces)]
 
-    xml_str = tostring(tree)
+    for bpmn_node in root.findall(".//bpmndi:BPMNShape", namespaces):
+        for node in list_diagram_nodes:
+            if node.get_idbpmn() == bpmn_node.attrib['bpmnElement']:
+                bounds = bpmn_node.findall('.//omgdc:Bounds', namespaces)
+                for bound in bounds:
+                    bound.attrib['x'] = str(node.get_x())
+                    bound.attrib['y'] = str(node.get_y())
+                    bound.attrib['width'] = str(node.get_w())
+                    bound.attrib['height'] = str(node.get_h())
+                    # print('aux', bound.attrib['x'], bound.attrib['y'], bound.attrib['y'], bound.attrib['width'])
 
-    bpmn_graph.export_xml_file(PATH_DIR_DIAGRAMS, diagram_filename_unique_id + '.xml')
+    et = etree.ElementTree(root)
+    et.write(PATH_DIR_DIAGRAMS + diagram_filename_unique_id + '.xml', pretty_print=True)
+    # bpmn_graph.export_xml_file(PATH_DIR_DIAGRAMS, diagram_filename_unique_id + '.xml')
 
 
 @api_view(['GET', 'POST'])
@@ -395,4 +423,31 @@ def diagram(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def do_cmd_to_shell_diagram_detector(diagram_path_filename):
+    """
+    Execute a cmd command and return output string
+    :param diagram_path_filename: String object.
+    :return: dict_objects. Dictionary object. Dictionary with diagram objects.
+    """
+    logger.info("do_cmd_to_shell_diagram_detector")
 
+    script_path_filename = PATH_DIAGRAM_GURU_PROJECT + '/diagram_detector/detector_main.py'
+
+    logger.info("path_diagram_guru_project: %s", PATH_DIAGRAM_GURU_PROJECT)
+
+    cmd_diagram_detector = ["python", script_path_filename,
+                            "--diagram_filename", diagram_path_filename,
+                            "--display_image", "True"]
+
+    process = subprocess.Popen(cmd_diagram_detector, stdout=subprocess.PIPE, stderr=None)
+    cmd_output = process.communicate()
+
+    dict_objects_str = cmd_output[0].decode("utf-8")
+
+    if dict_objects_str and dict_objects_str.strip():
+        dict_objects_str = str(dict_objects_str).replace("'", '"')
+        dict_objects = eval(dict_objects_str)
+    else:
+        dict_objects = {}
+
+    return dict_objects
