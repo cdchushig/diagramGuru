@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     # Local
     'app',
     'bpmn',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [

@@ -54,11 +54,19 @@
       bottom: 20px;
       left: 150px;
     }
+
    #create-diagram-sync{
       position: fixed;
       bottom: 20px;
       left: 280px;
    }
+
+    #list-diagrams{
+      position: fixed;
+      bottom: 20px;
+      left: 420px;
+    }
+
   </style>
 </head>
 <body>
@@ -70,6 +78,7 @@
     <button id="save-button">Save Diagram</button>
     <button id="close-button">Close Diagram</button>
     <button id="create-diagram-sync" >Create diagram</button>
+    <button id="list-diagrams" >See diagrams</button>
 
     <form>
         {% csrf_token %}
@@ -180,6 +189,13 @@
              document.location.href="../"
          }
       });
+
+      $('#list-diagrams').click(function(){
+          if (window.confirm("Are you sure you want to close this Diagram?")){
+             document.location.href="../list_diagram"
+          }
+      });
+
 
       // $("#create-diagram").modalForm({
       //   formURL: "{% url 'create_diagram' %}",

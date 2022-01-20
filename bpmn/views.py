@@ -42,26 +42,24 @@ class DiagramCreateView(BSModalCreateView):
 
 
 def modeler(request):
-    # bpmn_filename = 'https://cdn.rawgit.com/bpmn-io/bpmn-js-examples/dfceecba/starter/diagram.bpmn'
-    # context = {'bpmn_filename': bpmn_filename}
     return render(request, template_name='modeler.html')
 
 
-def list_diagram(request):
-    logger.info('List diagrams')
-    list_diagram = Diagram.objects.all()
-    context = {"bpmn_list": list_diagram}
-    template = 'list_diagram.html'
-    return render(request, template, context)
+# def list_diagram(request):
+#     logger.info('List diagrams')
+#     list_diagram = Diagram.objects.all()
+#     context = {"bpmn_list": list_diagram}
+#     template = 'list_diagram.html'
+#     return render(request, template, context)
 
 
-def create_new_diagram(request):
-    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'bpmn', 'diagrams', 'default.bpmn')
-    with open(bpmn_filename, 'r') as f:
-        bpmn_file_content = f.read()
-    context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
-    template = 'modeler.html'
-    return render(request, template, context)
+# def create_new_diagram(request):
+#     bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'bpmn', 'diagrams', 'default.bpmn')
+#     with open(bpmn_filename, 'r') as f:
+#         bpmn_file_content = f.read()
+#     context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
+#     template = 'modeler.html'
+#     return render(request, template, context)
 
 
 def save_diagram(request):
