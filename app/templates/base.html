@@ -28,18 +28,20 @@
       <link rel="stylesheet" href="static/app/css/nivo-lightbox.css">
     {% endblock stylesheets %}
 
+    {% block extrastyles %} {% endblock extrastyles %}
+
+    {% block mycss %} {% endblock mycss %}
+
     <title>Diagram Guru</title>
 
   </head>
 
   <body>
 
-    <!-- Includes -->
-    {% include "_header.html" %}
+    {% include 'messages.html' %}
 
     {% block content %}{% endblock content %}
 
-    <!-- Includes -->
     {% include "_footer.html" %}
 
     <!-- JavaScript -->

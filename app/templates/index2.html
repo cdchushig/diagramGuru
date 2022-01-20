@@ -4,7 +4,10 @@
 {% trans alert %}
 {% load static %}
 
+
 {% block content %}
+
+  {% include "_header.html" %}
 
   {% include "_form.html" %}
 
@@ -22,9 +25,9 @@
             </p>
     </div>
 
-    <div class="container">
-        <img src="static/app/img/logo_main.png"/>
-    </div>
+<!--    <div class="container">-->
+<!--        <img src="static/app/img/logo_main.png"/>-->
+<!--    </div>-->
 
 
     <div class = "container">
@@ -38,6 +41,7 @@
     </div>
 
   </div>
+
 
 {% endblock content %}
 
