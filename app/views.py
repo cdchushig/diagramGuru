@@ -5,25 +5,24 @@ import base64
 import json
 import requests
 import subprocess
-import numpy as np
 import itertools as it
 import operator
 
 import random
 import string
-from bs4 import BeautifulSoup
 
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login
-
-from django.contrib.auth.forms import UserCreationForm
+from django.conf import settings
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.shortcuts import render, redirect
+from django.contrib import messages
 
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .forms import UploadFileForm
+from .forms import UploadFileForm, NewUserForm
 from .models import Diagram
 from .serializers import DiagramSerializer
 from .app_consts import Consts
@@ -33,7 +32,6 @@ from pdf2image import convert_from_path, convert_from_bytes
 
 import networkx as nx
 from xml.etree.ElementTree import tostring
-from xml.etree.ElementTree import ElementTree
 import cv2
 
 from .diagram_node import DiagramNode
@@ -75,40 +73,61 @@ def index_app(request):
     return render(request, 'index2.html')
 
 
+def login_request(request):
+
+    if request.method == "POST":
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                messages.info(request, f"You are now logged in as {username}.")
+                return redirect("/list_diagram")
+            else:
+                messages.error(request, "Invalid username or password.")
+        else:
+            messages.error(request, "Invalid username or password.")
+
+    form = AuthenticationForm()
+
+    return render(request=request, template_name="login.html", context={"login_form": form})
+
+
+def signup(request):
+    if request.method == "POST":
+        form = NewUserForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful." )
+            return redirect("/list_diagram")
+
+        messages.error(request, "Unsuccessful registration. Invalid information.")
+
+    form = NewUserForm()
+
+    return render(request=request, template_name="signup.html", context={"register_form": form})
+
+
 def show_dashboard(request):
     return render(request, "dashboard.html", context={})
 
 
-def signup(request):
-    if request.method == 'POST':
-        form = UserCreationForm(request.POST)
-        if form.is_valid():
-            form.save()
-            username = form.cleaned_data.get('username')
-            raw_password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=raw_password)
-            login(request, user)
-            return redirect('/')
-    else:
-        form = UserCreationForm()
-    return render(request, 'signup.html', {'form': form})
-
-
-def xpath_eval(node, extra_ns=None):
-    """
-    Returns an XPathEvaluator, with namespace prefixes 'bpmn' for
-    http://www.omg.org/spec/BPMN/20100524/MODEL, and additional specified ones
-    """
-    namespaces = {'bpmn': BPMN_MODEL_NS,
-                  'dc': DIAG_COMMON_NS,
-                  'bpmndi': DIAG_INTERCHANGE_NS}
-    if extra_ns:
-        namespaces.update(extra_ns)
-    return lambda path: node.findall(path, namespaces)
-
-
 def create_model(request):
-    return HttpResponseRedirect('/bpmn/create_new_diagram')
+    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'bpmn', 'diagrams', 'default.bpmn')
+    with open(bpmn_filename, 'r') as f:
+        bpmn_file_content = f.read()
+    context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
+    template = 'modeler/modeler.html'
+    return render(request, template, context)
+
+
+def list_diagram(request):
+    logger.info('List diagrams')
+    list_diagram = Diagram.objects.all()
+    return render(request, 'list_diagram.html', {"bpmn_list": list_diagram})
 
 
 def show_model(request):
