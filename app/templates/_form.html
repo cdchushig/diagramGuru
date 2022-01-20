@@ -24,7 +24,7 @@
                     <h5 class="dark-text form-heading"><strong>{% trans "There is a option to analyze your diagram now!" %}</strong></h5>
 
                     <div id="drop-area">
-                    <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/show_modeler">
+                    <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/show_model">
                         {% csrf_token %}
                         {% trans "Please, if you have a diagram in the computer, you can analyze it here:" %}
                         <input  name='diagram_file' type='file' class='filestyle' data-buttonText='Choose Diagram'>
@@ -32,6 +32,10 @@
                         {% csrf_token %}
                     </form>
                     </div>
+
+                    <form name="form_create" class="project-form" action="/create_model" method="get">
+                        <button id="create" name='_create' type="submit" class="btn btn-primary standard-button">{% trans "Create my diagram" %}</button>
+                    </form>
 
                     <p class="file-error dark-text small-text">
                     {% trans "Error! Please choose a .jpg or .png file" %}</p>

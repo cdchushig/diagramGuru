@@ -5,7 +5,6 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views import generic
-from django.template import Context, Template
 
 from bootstrap_modal_forms.generic import BSModalCreateView, BSModalReadView
 
@@ -15,10 +14,6 @@ from .forms import DiagramModelForm
 import logging
 import coloredlogs
 from lxml import etree
-from xml.etree import ElementTree
-
-from io import StringIO, BytesIO
-
 
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
 PATH_DIAGRAM_GURU_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'

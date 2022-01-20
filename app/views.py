@@ -107,7 +107,11 @@ def xpath_eval(node, extra_ns=None):
     return lambda path: node.findall(path, namespaces)
 
 
-def show_modeler(request):
+def create_model(request):
+    return HttpResponseRedirect('/bpmn/create_new_diagram')
+
+
+def show_model(request):
     """
     Handle Request POST with uploded file
     :param request: Request object.
@@ -338,16 +342,6 @@ def order_nodes_by_center_positions(list_nodes):
     return list_nodes_sorted_filtered
 
 
-def stringify_children(node):
-    from lxml.etree import tostring
-    from itertools import chain
-    parts = ([node.text] +
-            list(chain(*([c.text, tostring(c), c.tail] for c in node.getchildren()))) +
-            [node.tail])
-    # filter removes possible Nones in texts and tails
-    return ''.join(filter(None, parts))
-
-
 def transform_graph_to_bpmn(diagram_graph, list_diagram_nodes, diagram_filename_unique_id, diagram_name='diagram1'):
     """
     Build a BPMN file (.bpmn or .xml) with a dictionary of elements linked to a diagram
@@ -365,17 +359,11 @@ def transform_graph_to_bpmn(diagram_graph, list_diagram_nodes, diagram_filename_
     m_adj = nx.adjacency_matrix(diagram_graph)
     m_adj_dense = m_adj.todense()
 
-    task_id_src = 1000
-    task_id_dst = 1000
-
     list_aux = []
 
     for diagram_node in list_diagram_nodes:
         print('x', diagram_node)
-        [task1_id, _] = create_bpmn_graph_element(diagram_node,
-                                                  process_id,
-                                                  bpmn_graph)
-
+        [task1_id, _] = create_bpmn_graph_element(diagram_node, process_id, bpmn_graph)
         diagram_node.set_idbpmn(task1_id)
         list_aux.append(diagram_node)
 
@@ -390,6 +378,7 @@ def transform_graph_to_bpmn(diagram_graph, list_diagram_nodes, diagram_filename_
     for edge in root.findall(".//bpmndi:BPMNEdge", namespaces):
         edge.getparent().remove(edge)
 
+    # Check ids of list and xml
     [print(node) for node in list_diagram_nodes]
     [print(node.attrib['bpmnElement']) for node in root.findall(".//bpmndi:BPMNShape", namespaces)]
 
@@ -402,11 +391,9 @@ def transform_graph_to_bpmn(diagram_graph, list_diagram_nodes, diagram_filename_
                     bound.attrib['y'] = str(node.get_y())
                     bound.attrib['width'] = str(node.get_w())
                     bound.attrib['height'] = str(node.get_h())
-                    # print('aux', bound.attrib['x'], bound.attrib['y'], bound.attrib['y'], bound.attrib['width'])
 
     et = etree.ElementTree(root)
     et.write(PATH_DIR_DIAGRAMS + diagram_filename_unique_id + '.xml', pretty_print=True)
-    # bpmn_graph.export_xml_file(PATH_DIR_DIAGRAMS, diagram_filename_unique_id + '.xml')
 
 
 @api_view(['GET', 'POST'])

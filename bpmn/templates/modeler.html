@@ -67,9 +67,9 @@
 
     <div id="canvas"></div>
 
-<!--    <button id="save-button">Save Diagram</button>-->
-<!--    <button id="close-button">Close Diagram</button>-->
-<!--    <button id="create-diagram-sync" >Create diagram</button>-->
+    <button id="save-button">Save Diagram</button>
+    <button id="close-button">Close Diagram</button>
+    <button id="create-diagram-sync" >Create diagram</button>
 
     <form>
         {% csrf_token %}
@@ -177,7 +177,7 @@
       $('#close-button').click(function(){
           // #TODO: check for unsaved changes
          if (window.confirm("Are you sure you want to close this Diagram?")){
-             document.location.href="../list_diagrams"
+             document.location.href="../"
          }
       });
 
