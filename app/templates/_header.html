@@ -1,0 +1,30 @@
+{% load i18n %}
+{% trans alert %}
+{% load static %}
+
+<header id="home" style="background-position: 50% 40px;" class="header" data-stellar-background-ratio="0.3">
+        <div class="navbar navbar-inverse bs-docs-nav navbar-fixed-top  sticky-navigation" role="navigation">
+            <div class="container">
+                <div class="navbar-collapse collapse" id="stamp-navigation">
+                  <a class="navbar-brand" href="/">
+                    <img style="height: 100%; width: 100%; object-fit: contain" src="static/app/img/logo_diagramguru.png" alt="">
+                  </a>
+
+                {% if flagUser %}
+                     <ul class="nav navbar-nav navbar-left main-navigation ">
+                         <li class="navbar-brand"><a class="navbar-brand pull-left" href="/{{page}}/{{username}}"><span class="icon-basic-home colored-text"></span><em>{{ username }}</em></a></li>
+                    </ul>
+                {% else %}
+
+                {% endif %}
+
+                    <li style="display: none;" class="register-button js-register inpage-scroll">
+                        <a href="#home" class="navbar-register-button">{% trans "Get Started" %}</a>
+                    </li>
+                </ul>
+
+
+                </div>
+            </div>
+      </div>
+</header>
