@@ -7,46 +7,18 @@
 {% block content %}
 
 
-
 {% endblock content %}
 
 {% block extrascripts %}
-  <script type="text/javascript">
-      var holi = 'holi';
-  </script>
-{% endblock extrascripts %}
 
-
-
-
-
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html lang="es">
-<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Analyzing</title>
-        <link rel="icon" href="../../static/app/images/favicon.ico">
-        <script type="text/javascript" src="/../../static/app/scripts/js/progress-bar.js"></script>
-		<!-- Bootstrap core CSS -->
-	    <link href="../../static/app/content/bootstrap.min.css" rel="stylesheet">
-	    <!-- Add custom CSS here -->
-	    <link href="../../static/app/content/sb-admin.css" rel="stylesheet">
-
-
-		<!--Librería jQuery requerida para los plugins de Javascript-->
-		<script src="../../static/app/scripts/jquery.js"></script>
-		<!--Todos los plugins Javascript de bootStrap-->
-		<script src="../../static/app/scripts/bootstrap.min.js"></script>
-		<script src="../../static/app/scripts/bootstrap-filestyle.js"></script>
-        <link rel='stylesheet' href='../../static/app/content/style.css'>
-        <link rel="stylesheet" href="../../static/app/content/master.css" type="text/css" />
-
-    
-	
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
-	<script>
+<link rel="stylesheet" href="{% static 'app/css/style.css' %}">
+<script src="{% static 'app/scripts/jquery.js' %}"></script>
+<script src="../../static/app/scripts/jquery.js"></script>
+<script src="../../static/app/scripts/bootstrap.min.js"></script>
+<script src="../../static/app/scripts/bootstrap-filestyle.js"></script>
+<script type="text/javascript" src="/../../static/app/scripts/js/progress-bar.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+<script>
 		$(function() {
 			$(".progress").each(function() {
 				$(this)
@@ -57,7 +29,29 @@
 					}, 25000);
 			});
 		});
-	</script>
+</script>
+
+{% endblock extrascripts %}
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="es">
+<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Analyzing</title>
+        <link rel="icon" href="../../static/app/images/favicon.ico">
+
+		<!-- Bootstrap core CSS -->
+	    <link href="../../static/app/content/bootstrap.min.css" rel="stylesheet">
+	    <!-- Add custom CSS here -->
+	    <link href="../../static/app/content/sb-admin.css" rel="stylesheet">
+
+
+		<link rel='stylesheet' href='../../static/app/content/style.css'>
+        <link rel="stylesheet" href="../../static/app/content/master.css" type="text/css" />
+
+
 	
 	<link rel="stylesheet" href="../../static/app/content/progress-bar.css">
 </head>
@@ -68,17 +62,13 @@
 
 <div class="jumbotron">
 <div class="container">
-        <p>
-            <h2>
-                Wait a moment please
-            </h2>
-        </p>
+    <p><h2>Wait a moment please</h2></p>
 </div>
 
 
-    <div class="container">
-        <img src="../../static/app/images/logo_main.png"/>
-    </div>
+<div class="container">
+    <img src="../../static/app/images/logo_main.png"/>
+</div>
 
 
 
