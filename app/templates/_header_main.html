@@ -3,7 +3,6 @@
 {% load static %}
 
 <header id="home" style="background-position: 50% 40px;" class="header" data-stellar-background-ratio="0.3">
-<!--    <div class="overlay-layer">-->
         <div class="navbar navbar-inverse bs-docs-nav navbar-fixed-top  sticky-navigation" role="navigation">
             <div class="container">
                 <div class="navbar-collapse collapse" id="stamp-navigation">
@@ -48,9 +47,9 @@
                 </ul>
                   </li>
                   <li style="display: block;" class="login js-login dropdown">
-                    <a aria-expanded="false" role="button" class="dropdown-toggle" data-toggle='modal' href='#modalSignUp'>{% trans "Sign up" %}</a>
+                    <a aria-expanded="false" role="button" class="dropdown-toggle" data-toggle='modal' href='/signup'>{% trans "Sign up" %}</a>
 
-                    </a>
+<!--                    </a>-->
                     <ul role="menu" class="dropdown-menu">
                       <li>
                       <div style="padding: 15px; padding-bottom: 10px;">
@@ -98,5 +97,4 @@
                 </div>
             </div>
       </div>
-<!--    </div>-->
 </header>
