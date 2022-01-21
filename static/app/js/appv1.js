@@ -1185,7 +1185,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-var MILESTONE_BORDER_RADIUS = 24;
 var RENDERER_IDS = new ids__WEBPACK_IMPORTED_MODULE_1__["default"]();
 var DEFAULT_FILL_OPACITY = .95;
 var HIGH_FILL_OPACITY = .35;
@@ -1233,48 +1232,11 @@ function ODRenderer(
       cy: cy,
       r: Math.round((width + height) / 4 - offset)
     });
-
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(circle, attrs);
 
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, circle);
 
     return circle;
-  }
-
-  function drawOval(parentGfx, width, height, offset, attrs) {
-    if ((0,min_dash__WEBPACK_IMPORTED_MODULE_3__.isObject)(offset)) {
-      attrs = offset;
-      offset = 0;
-    }
-
-    offset = offset || 0;
-
-    attrs = computeStyle(attrs, {
-      stroke: 'black',
-      strokeWidth: 2,
-      fill: 'white'
-    });
-
-    if (attrs.fill === 'none') {
-      delete attrs.fillOpacity;
-    }
-
-    var cx = width / 2,
-        cy = height / 2;
-
-    var oval = (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.create)('ellipse');
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(oval, {
-      cx: cx,
-      cy: cy,
-      rx: width,
-      ry: cy
-    });
-
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(oval, attrs);
-
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, oval);
-
-    return oval;
   }
 
   function drawRect(parentGfx, width, height, r, offset, attrs) {
@@ -1307,97 +1269,6 @@ function ODRenderer(
 
     return rect;
   }
-
-  function drawDiamond(parentGfx, width, height, attrs) {
-
-    var x_2 = width / 2;
-    var y_2 = height / 2;
-
-    var points = [{ x: x_2, y: 0 }, { x: width, y: y_2 }, { x: x_2, y: height }, { x: 0, y: y_2 }];
-
-    var pointsString = points.map(function(point) {
-      return point.x + ',' + point.y;
-    }).join(' ');
-
-    attrs = computeStyle(attrs, {
-      stroke: 'black',
-      strokeWidth: 2,
-      fill: 'white'
-    });
-
-    var polygon = (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.create)('polygon');
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(polygon, {
-      points: pointsString
-    });
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(polygon, attrs);
-
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, polygon);
-
-    return polygon;
-  }
-
-  function drawParallelogram(parentGfx, width, height, attrs) {
-
-    var x_1 = width / 4;
-    var y_1 = height / 4;
-    var x_2 = width / 2;
-    var y_2 = height / 2;
-
-    var points = [{ x: x_1, y: 0 }, { x: 0, y: height }, { x: width, y: height }, { x: width + x_1, y: 0 } ];
-    // var points = [{ x: x_2, y: 0 }, { x: x_1, y: height }, { x: width, y: height }, { x: width + x_1, y: 0 } ];
-    // var points = [{ x: 150, y:150}, { x: 100, y: 200 }, { x: 200, y: 200 }, { x: 250, y: 150 } ];
-
-    var pointsString = points.map(function(point) {
-      return point.x + ',' + point.y;
-    }).join(' ');
-
-    attrs = computeStyle(attrs, {
-      stroke: 'black',
-      strokeWidth: 2,
-      fill: 'white'
-    });
-
-    var polygon = (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.create)('polygon');
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(polygon, {
-      points: pointsString
-    });
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(polygon, attrs);
-
-    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, polygon);
-
-    return polygon;
-  }
-
-  // function drawRect(parentGfx, width, height, r, offset, attrs) {
-  //
-  //   if (isObject(offset)) {
-  //     attrs = offset;
-  //     offset = 0;
-  //   }
-  //
-  //   offset = offset || 0;
-  //
-  //   attrs = computeStyle(attrs, {
-  //     stroke: 'black',
-  //     strokeWidth: 2,
-  //     fill: 'white'
-  //   });
-  //
-  //   var rect = svgCreate('rect');
-  //   svgAttr(rect, {
-  //     x: offset,
-  //     y: offset,
-  //     width: width - offset * 2,
-  //     height: height - offset * 2,
-  //     rx: r,
-  //     ry: r
-  //   });
-  //   svgAttr(rect, attrs);
-  //
-  //   svgAppend(parentGfx, rect);
-  //
-  //   return rect;
-  // }
 
   function drawPath(parentGfx, d, attrs) {
 
@@ -1474,40 +1345,6 @@ function ODRenderer(
       renderLabel(parentGfx, semantic.attributeValues, {
         box: {
           height: element.height + 30,
-          width: element.width
-        },
-        padding: 5,
-        align: 'center-middle',
-        style: {
-          fill: defaultStrokeColor
-        }
-      });
-    }
-  }
-
-  function renderAttributesGeneral(parentGfx, element) {
-    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getSemantic)(element);
-    if (semantic.attributeValues) {
-      renderLabel(parentGfx, semantic.attributeValues, {
-        box: {
-          height: element.height,
-          width: element.width
-        },
-        padding: 5,
-        align: 'center-middle',
-        style: {
-          fill: defaultStrokeColor
-        }
-      });
-    }
-  }
-
-  function renderAttributesGeneral2(parentGfx, element) {
-    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getSemantic)(element);
-    if (semantic.attributeValues) {
-      renderLabel(parentGfx, semantic.attributeValues, {
-        box: {
-          height: element.height,
           width: element.width
         },
         padding: 5,
@@ -1692,81 +1529,6 @@ function ODRenderer(
 
       var rect = drawCircle(parentGfx, element.width, element.height, attrs);
 
-      renderEmbeddedLabel(parentGfx, element, 'center-middle');
-      renderAttributesGeneral(parentGfx, element);
-
-      return rect;
-    },
-    'od:Decision': function(parentGfx, element) {
-
-      var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
-      };
-
-      if (!('fillOpacity' in attrs)) {
-        attrs.fillOpacity = DEFAULT_FILL_OPACITY;
-      }
-
-      var rect = drawDiamond(parentGfx, element.width, element.height, attrs);
-
-      renderEmbeddedLabel(parentGfx, element, 'center-middle');
-      renderAttributesGeneral(parentGfx, element);
-
-      return rect;
-    },
-    'od:Rectangle': function(parentGfx, element) {
-
-      var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
-      };
-
-      if (!('fillOpacity' in attrs)) {
-        attrs.fillOpacity = DEFAULT_FILL_OPACITY;
-      }
-
-      var rect = drawRect(parentGfx, element.width, element.height, 0, attrs);
-
-      renderEmbeddedLabel(parentGfx, element, 'center-middle');
-      renderAttributesGeneral(parentGfx, element);
-
-      return rect;
-    },
-    'od:Parallelogram': function(parentGfx, element) {
-
-      var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
-      };
-
-      if (!('fillOpacity' in attrs)) {
-        attrs.fillOpacity = DEFAULT_FILL_OPACITY;
-      }
-
-      var rect = drawParallelogram(parentGfx, element.width, element.height, 0, attrs);
-
-      renderEmbeddedLabel(parentGfx, element, 'center-middle');
-      renderAttributesGeneral2(parentGfx, element);
-
-      return rect;
-    },
-    'od:Oval': function(parentGfx, element) {
-
-      var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
-      };
-
-      if (!('fillOpacity' in attrs)) {
-        attrs.fillOpacity = DEFAULT_FILL_OPACITY;
-      }
-
-      var rect = drawOval(parentGfx, element.width, element.height, attrs);
-
-      renderEmbeddedLabel(parentGfx, element, 'center-middle');
-      renderAttributesGeneral(parentGfx, element);
-
       return rect;
     },
     'od:TextBox': function(parentGfx, element) {
@@ -1799,6 +1561,7 @@ ODRenderer.$inject = [
   'canvas',
   'textRenderer'
 ];
+
 
 ODRenderer.prototype.canRender = function(element) {
   return (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_9__.is)(element, 'od:BoardElement');
@@ -2205,10 +1968,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! min-dash */ "../node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var diagram_js_lib_util_Mouse__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! diagram-js/lib/util/Mouse */ "../node_modules/diagram-js/lib/util/Mouse.js");
-/* harmony import */ var _util_ColorUtil__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../util/ColorUtil */ "../lib/util/ColorUtil.js");
-/* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../util/ModelUtil */ "../lib/util/ModelUtil.js");
-
-
 
 
 
@@ -2289,19 +2048,15 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
   }
 
   createDeleteEntry(actions);
-  // if (element.type === 'od:Object') {
-  createLinkObjectsEntry(actions);
-  // createLinkNewObjectEntry(actions);
-  // }
+  if (element.type === 'od:Object') {
+    createLinkObjectsEntry(actions);
+    createLinkNewObjectEntry(actions);
+  }
 
   return actions;
 
   function removeElement() {
     modeling.removeElements([ element ]);
-  }
-
-  function setColor(color) {
-    modeling.setColor(element, color);
   }
 
   function createDeleteEntry(actions) {
@@ -2327,35 +2082,6 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
         }
       });
     }
-  }
-
-  function createColoringEntries(actions) {
-    forEach(keys(_util_ColorUtil__WEBPACK_IMPORTED_MODULE_2__["default"]), key => {
-      var color = _util_ColorUtil__WEBPACK_IMPORTED_MODULE_2__["default"][key];
-
-      function getClassNames() {
-        var classNames = [];
-
-        if (color === getColor(element)) {
-          classNames.push('pjs-color-entry-disabled');
-        }
-
-        classNames.push('pjs-color-entry-' + key);
-
-        return classNames;
-      }
-
-      (0,min_dash__WEBPACK_IMPORTED_MODULE_1__.assign)(actions, {
-        ['color-' + key]: {
-          group: 'color',
-          className: getClassNames(),
-          title: translate('Set Color'),
-          action: {
-            click: (event) => setColor(color)
-          }
-        }
-      });
-    });
   }
 
   function startConnect(event, element) {
@@ -2411,6 +2137,7 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
       });
     }
 
+
     var append = autoPlace ? function(event, element) {
       var shape = elementFactory.createShape((0,min_dash__WEBPACK_IMPORTED_MODULE_1__.assign)({ type: type }, options));
 
@@ -2429,14 +2156,6 @@ ContextPadProvider.prototype.getContextPadEntries = function(element) {
     };
   }
 };
-
-// helpers //////////
-
-function getColor(element) {
-  var bo = (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__.getBusinessObject)(element);
-
-  return bo.color || element.color;
-}
 
 /***/ }),
 
@@ -4672,6 +4391,7 @@ ODFactory.prototype.createDiEdge = function(semantic, waypoints, attrs) {
     boardElement: semantic
   }, attrs));
 };
+
 
 ODFactory.prototype.createDiPlane = function(semantic) {
   return this.create('odDi:OdPlane', {
@@ -7670,7 +7390,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ PaletteProvider)
 /* harmony export */ });
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! min-dash */ "../node_modules/min-dash/dist/index.esm.js");
-
+/* harmony import */ var _util_ColorUtil__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../util/ColorUtil */ "../lib/util/ColorUtil.js");
 
 
 
@@ -7748,26 +7468,26 @@ PaletteProvider.prototype.getPaletteEntries = function(element) {
         }
       }
     },
-    // 'lasso-tool': {
-    //   group: 'tools',
-    //   className: 'bpmn-icon-lasso-tool',
-    //   title: translate('Activate the lasso tool'),
-    //   action: {
-    //     click: function(event) {
-    //       lassoTool.activateSelection(event);
-    //     }
-    //   }
-    // },
-    // 'space-tool': {
-    //   group: 'tools',
-    //   className: 'bpmn-icon-space-tool',
-    //   title: translate('Activate the create/remove space tool'),
-    //   action: {
-    //     click: function(event) {
-    //       spaceTool.activateSelection(event);
-    //     }
-    //   }
-    // },
+    'lasso-tool': {
+      group: 'tools',
+      className: 'bpmn-icon-lasso-tool',
+      title: translate('Activate the lasso tool'),
+      action: {
+        click: function(event) {
+          lassoTool.activateSelection(event);
+        }
+      }
+    },
+    'space-tool': {
+      group: 'tools',
+      className: 'bpmn-icon-space-tool',
+      title: translate('Activate the create/remove space tool'),
+      action: {
+        click: function(event) {
+          spaceTool.activateSelection(event);
+        }
+      }
+    },
     'tool-separator': {
       group: 'tools',
       separator: true
@@ -7777,24 +7497,8 @@ PaletteProvider.prototype.getPaletteEntries = function(element) {
       translate('Create object')
     ),
     'create-circle': createAction(
-      'od:Circle', 'od-elements', 'bpmn-icon-start-event-none',
-      translate('Create Circle')
-    ),
-    'create-decision': createAction(
-      'od:Decision', 'od-elements', 'bpmn-icon-gateway-none',
-      translate('Create Decision')
-    ),
-    'create-rectangle': createAction(
-      'od:Rectangle', 'od-elements', 'bpmn-icon-task',
-      translate('Create Rectangle')
-    ),
-    'create-parallelogram': createAction(
-      'od:Parallelogram', 'od-elements', 'pjs-parallelogram',
-      translate('Create Rhomboid')
-    ),
-    'create-oval': createAction(
-      'od:Oval', 'od-elements', 'pjs-ellipse',
-      translate('Create Oval')
+      'od:Circle', 'od-elements', 'od-icon-circle',
+      translate('Create Circle Postit'), { color: _util_ColorUtil__WEBPACK_IMPORTED_MODULE_1__["default"].PINK }
     ),
     'object-linker': {
       group: 'od-elements',
@@ -8087,27 +7791,14 @@ function canConnect(source, target) {
   if (nonExistingOrLabel(source) || nonExistingOrLabel(target)) {
     return null;
   }
-
-  // no connections of object with other uml elements
-  if ((0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__.is)(source, 'od:Object') && ((0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__.is)(target, 'od:Circle'))) {
-    return false;
-  }
-
-  if ((0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__.is)(source, 'od:Circle') && ((0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__.is)(target, 'od:Object'))) {
-    return false;
-  }
-
   if (canConnectLink(source, target)) {
     return { type: 'od:Link' };
   }
-
   return false;
 }
 
-
 function canConnectLink(source, target) {
-  // return is(source, 'od:Object') && is(target, 'od:Object');
-  return true;
+  return (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__.is)(source, 'od:Object') && (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_3__.is)(target, 'od:Object');
 }
 
 /**
@@ -8156,6 +7847,7 @@ function canAttach(elements, target) {
   return 'attach';
 }
 
+
 function canMove(elements, target) {
 
   // allow default move check to start move operation
@@ -8192,7 +7884,7 @@ function canCreate(shape, target, source, position) {
 }
 
 function canResize(shape, newBounds) {
-  if ((0,_modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_5__.isAny)(shape, [ 'od:Object', 'od:Circle', 'od:Decision', 'od:Rectangle', 'od:Oval', 'od:Parallelogram' ])) {
+  if ((0,_modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_5__.isAny)(shape, [ 'od:Object' ])) {
     return !newBounds || (newBounds.width >= 50 && newBounds.height >= 50);
   }
   return false;
@@ -9323,8 +9015,7 @@ __webpack_require__.r(__webpack_exports__);
   BLUE: '#23BFE7',
   ORANGE: '#FF9D48',
   YELLOW: '#F5D128',
-  BLACK: 'black',
-  WHITE: 'white'
+  BLACK: 'black'
 });
 
 /***/ }),
@@ -47652,11 +47343,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _font_awesome_5_29f589f173dcc69ef6c805b711894998_woff__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff */ "../assets/font-awesome-5/29f589f173dcc69ef6c805b711894998.woff");
 /* harmony import */ var _font_awesome_5_29f589f173dcc69ef6c805b711894998_ttf__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./font-awesome-5/29f589f173dcc69ef6c805b711894998.ttf */ "../assets/font-awesome-5/29f589f173dcc69ef6c805b711894998.ttf");
 /* harmony import */ var _font_awesome_5_29f589f173dcc69ef6c805b711894998_svg__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./font-awesome-5/29f589f173dcc69ef6c805b711894998.svg */ "../assets/font-awesome-5/29f589f173dcc69ef6c805b711894998.svg");
-/* harmony import */ var _icons_ellipse_svg__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./icons/ellipse.svg */ "../assets/icons/ellipse.svg");
-/* harmony import */ var _icons_parallelogram_svg__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./icons/parallelogram.svg */ "../assets/icons/parallelogram.svg");
 // Imports
-
-
 
 
 
@@ -47680,10 +47367,8 @@ var ___CSS_LOADER_URL_REPLACEMENT_3___ = _starter_node_modules_css_loader_dist_r
 var ___CSS_LOADER_URL_REPLACEMENT_4___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_font_awesome_5_29f589f173dcc69ef6c805b711894998_woff__WEBPACK_IMPORTED_MODULE_9__["default"]);
 var ___CSS_LOADER_URL_REPLACEMENT_5___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_font_awesome_5_29f589f173dcc69ef6c805b711894998_ttf__WEBPACK_IMPORTED_MODULE_10__["default"]);
 var ___CSS_LOADER_URL_REPLACEMENT_6___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_font_awesome_5_29f589f173dcc69ef6c805b711894998_svg__WEBPACK_IMPORTED_MODULE_11__["default"], { hash: "#Font Awesome 5 Free Solid" });
-var ___CSS_LOADER_URL_REPLACEMENT_7___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_icons_ellipse_svg__WEBPACK_IMPORTED_MODULE_12__["default"]);
-var ___CSS_LOADER_URL_REPLACEMENT_8___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_icons_parallelogram_svg__WEBPACK_IMPORTED_MODULE_13__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "@font-face {\n  font-family: \"IBM Plex\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + "); /* IE9*/\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_3___ + ") format(\"woff2\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_4___ + ") format(\"woff\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_5___ + ") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_6___ + ") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.pjs-ellipse {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_7___ + ");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-parallelogram {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_8___ + ");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n", "",{"version":3,"sources":["webpack://./../assets/odm.css"],"names":[],"mappings":"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","sourcesContent":["@import '../node_modules/diagram-js/assets/diagram-js.css';\n@import '../node_modules/bpmn-font/dist/css/bpmn.css';\n@import url('./css/od.css');\n\n@font-face {\n  font-family: \"IBM Plex\";\n  src: url(\"./ibm-plex-font/IBMPlexSans-Regular.ttf\");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot\"); /* IE9*/\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot?#iefix\") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff2\") format(\"woff2\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff\") format(\"woff\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.ttf\") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.svg#Font Awesome 5 Free Solid\") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.pjs-ellipse {\n  background-image: url(\"./icons/ellipse.svg\");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-parallelogram {\n  background-image: url(\"./icons/parallelogram.svg\");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "@font-face {\n  font-family: \"IBM Plex\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + "); /* IE9*/\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_3___ + ") format(\"woff2\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_4___ + ") format(\"woff\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_5___ + ") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_6___ + ") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n", "",{"version":3,"sources":["webpack://./../assets/odm.css"],"names":[],"mappings":"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","sourcesContent":["@import '../node_modules/diagram-js/assets/diagram-js.css';\n@import '../node_modules/bpmn-font/dist/css/bpmn.css';\n@import url('./css/od.css');\n\n@font-face {\n  font-family: \"IBM Plex\";\n  src: url(\"./ibm-plex-font/IBMPlexSans-Regular.ttf\");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot\"); /* IE9*/\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot?#iefix\") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff2\") format(\"woff2\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff\") format(\"woff\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.ttf\") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.svg#Font Awesome 5 Free Solid\") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -48091,36 +47776,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "0519459d8ed646e0f90de040a2f1fa2b.ttf");
-
-/***/ }),
-
-/***/ "../assets/icons/ellipse.svg":
-/*!***********************************!*\
-  !*** ../assets/icons/ellipse.svg ***!
-  \***********************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "f2e04ee91b321cd9753b8439ede02431.svg");
-
-/***/ }),
-
-/***/ "../assets/icons/parallelogram.svg":
-/*!*****************************************!*\
-  !*** ../assets/icons/parallelogram.svg ***!
-  \*****************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "307cd8e7968f46b161fcc193ad37c918.svg");
 
 /***/ }),
 
@@ -59106,10 +58761,10 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/sampleBoard2.xml":
-/*!************************************!*\
-  !*** ./resources/sampleBoard2.xml ***!
-  \************************************/
+/***/ "./resources/sampleBoard.xml":
+/*!***********************************!*\
+  !*** ./resources/sampleBoard.xml ***!
+  \***********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -59117,7 +58772,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<od:definitions xmlns:od=\"http://tk/schema/od\" xmlns:odDi=\"http://tk/schema/odDi\" xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\">\n  <od:odBoard id=\"Board_debug\">\n    <od:object name=\"ClassExample\" id=\"Object_178yfzj\" attributeValues=\"-methodA()\" />\n  </od:odBoard>\n  <odDi:odRootBoard id=\"RootBoard_debug\">\n    <odDi:odPlane id=\"Plane_debug\" boardElement=\"Board_debug\">\n      <odDi:odShape id=\"Object_178yfzj_di\" boardElement=\"Object_178yfzj\">\n        <dc:Bounds x=\"230\" y=\"200\" width=\"150\" height=\"90\" />\n      </odDi:odShape>\n    </odDi:odPlane>\n  </odDi:odRootBoard>\n</od:definitions>\n");
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<od:definitions xmlns:od=\"http://tk/schema/od\" xmlns:odDi=\"http://tk/schema/odDi\"\n                xmlns:dc=\"http://www.omg.org/spec/DD/20100524/DC\">\n    <od:odBoard id=\"Board_debug\">\n        <od:link name=\"components\" id=\"Link_Object_2669_to_Object_2837_type_components\" type=\"components\"\n                 sourceRef=\"Object_2669\" targetRef=\"Object_2837\"/>\n        <od:link name=\"components\" id=\"Link_Object_2669_to_Object_2838_type_components\" type=\"components\"\n                 sourceRef=\"Object_2669\" targetRef=\"Object_2838\"/>\n        <od:link name=\"components\" id=\"Link_Object_2669_to_Object_2839_type_components\" type=\"components\"\n                 sourceRef=\"Object_2669\" targetRef=\"Object_2839\"/>\n        <od:link name=\"components\" id=\"Link_Object_2669_to_Object_2840_type_components\" type=\"components\"\n                 sourceRef=\"Object_2669\" targetRef=\"Object_2840\"/>\n        <od:object name=\"folding_wall_table:Product\" id=\"Object_2669\"\n                   attributeValues=\"cost=5&#10;name=&#34;Folding wall table&#34;\">\n            <od:links>Link_Object_2669_to_Object_2837_type_components</od:links>\n            <od:links>Link_Object_2669_to_Object_2838_type_components</od:links>\n            <od:links>Link_Object_2669_to_Object_2839_type_components</od:links>\n            <od:links>Link_Object_2669_to_Object_2840_type_components</od:links>\n        </od:object>\n        <od:object name=\"0:QuantifiedComponent\" id=\"Object_2837\" attributeValues=\"quantity=4\"/>\n        <od:object name=\"1:QuantifiedComponent\" id=\"Object_2838\" attributeValues=\"quantity=10\"/>\n        <od:object name=\"2:QuantifiedComponent\" id=\"Object_2839\" attributeValues=\"quantity=1\"/>\n        <od:object name=\"3:QuantifiedComponent\" id=\"Object_2840\" attributeValues=\"quantity=26\"/>\n    </od:odBoard>\n    <odDi:odRootBoard id=\"RootBoard_debug\">\n        <odDi:odPlane id=\"Plane_debug\" boardElement=\"Board_debug\">\n            <odDi:link id=\"Link_Object_2669_to_Object_2837_type_components_di\"\n                       boardElement=\"Link_Object_2669_to_Object_2837_type_components\">\n                <odDi:waypoint x=\"566.1\" y=\"198.60000000000002\"/>\n                <odDi:waypoint x=\"566.1\" y=\"233.60000000000002\"/>\n                <odDi:waypoint x=\"652.5\" y=\"233.60000000000002\"/>\n                <odDi:waypoint x=\"652.5\" y=\"296.6\"/>\n                <odDi:odLabel>\n                    <dc:Bounds x=\"560\" y=\"240\" width=\"82\" height=\"18\"/>\n                </odDi:odLabel>\n            </odDi:link>\n            <odDi:link id=\"Link_Object_2669_to_Object_2838_type_components_di\"\n                       boardElement=\"Link_Object_2669_to_Object_2838_type_components\">\n                <odDi:waypoint x=\"610.3\" y=\"198.60000000000002\"/>\n                <odDi:waypoint x=\"610.3\" y=\"223.60000000000002\"/>\n                <odDi:waypoint x=\"869.5\" y=\"223.60000000000002\"/>\n                <odDi:waypoint x=\"869.5\" y=\"296.6\"/>\n                <odDi:odLabel>\n                    <dc:Bounds x=\"699\" y=\"199\" width=\"82\" height=\"18\"/>\n                </odDi:odLabel>\n            </odDi:link>\n            <odDi:link id=\"Link_Object_2669_to_Object_2839_type_components_di\"\n                       boardElement=\"Link_Object_2669_to_Object_2839_type_components\">\n                <odDi:waypoint x=\"477.7\" y=\"198.60000000000002\"/>\n                <odDi:waypoint x=\"477.7\" y=\"223.60000000000002\"/>\n                <odDi:waypoint x=\"218.5\" y=\"223.60000000000002\"/>\n                <odDi:waypoint x=\"218.5\" y=\"296.6\"/>\n                <odDi:odLabel>\n                    <dc:Bounds x=\"307\" y=\"199\" width=\"82\" height=\"18\"/>\n                </odDi:odLabel>\n            </odDi:link>\n            <odDi:link id=\"Link_Object_2669_to_Object_2840_type_components_di\"\n                       boardElement=\"Link_Object_2669_to_Object_2840_type_components\">\n                <odDi:waypoint x=\"521.9\" y=\"198.60000000000002\"/>\n                <odDi:waypoint x=\"521.9\" y=\"233.60000000000002\"/>\n                <odDi:waypoint x=\"435.5\" y=\"233.60000000000002\"/>\n                <odDi:waypoint x=\"435.5\" y=\"296.6\"/>\n                <odDi:odLabel>\n                    <dc:Bounds x=\"450\" y=\"240\" width=\"82\" height=\"18\"/>\n                </odDi:odLabel>\n            </odDi:link>\n            <odDi:odShape id=\"Object_2669_di\" boardElement=\"Object_2669\">\n                <dc:Bounds x=\"434\" y=\"120\" width=\"221\" height=\"78\"/>\n            </odDi:odShape>\n            <odDi:odShape id=\"Object_2837_di\" boardElement=\"Object_2837\">\n                <dc:Bounds x=\"554\" y=\"297\" width=\"197\" height=\"59\"/>\n            </odDi:odShape>\n            <odDi:odShape id=\"Object_2838_di\" boardElement=\"Object_2838\">\n                <dc:Bounds x=\"771\" y=\"297\" width=\"197\" height=\"59\"/>\n            </odDi:odShape>\n            <odDi:odShape id=\"Object_2839_di\" boardElement=\"Object_2839\">\n                <dc:Bounds x=\"120\" y=\"297\" width=\"197\" height=\"59\"/>\n            </odDi:odShape>\n            <odDi:odShape id=\"Object_2840_di\" boardElement=\"Object_2840\">\n                <dc:Bounds x=\"337\" y=\"297\" width=\"197\" height=\"59\"/>\n            </odDi:odShape>\n        </odDi:odPlane>\n    </odDi:odRootBoard>\n</od:definitions>\n");
 
 /***/ }),
 
@@ -59448,7 +59103,7 @@ module.exports = JSON.parse('{"name":"dc","uri":"http://www.omg.org/spec/DD/2010
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"Object diagram","uri":"http://tk/schema/od","prefix":"od","xml":{"tagAlias":"lowerCase"},"types":[{"name":"BoardElement","isAbstract":true,"properties":[{"name":"name","isAttr":true,"type":"String"},{"name":"id","isAttr":true,"type":"String","isId":true}]},{"name":"Object","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Circle","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Decision","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Rectangle","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Parallelogram","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Oval","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Link","superClass":["BoardElement"],"properties":[{"name":"type","isAttr":true,"type":"String"},{"name":"sourceRef","isAttr":true,"isReference":true,"type":"Object"},{"name":"targetRef","isAttr":true,"isReference":true,"type":"Object"}]},{"name":"OdBoard","superClass":["RootElement"],"properties":[{"name":"boardElements","isMany":true,"type":"BoardElement"}]},{"name":"TextBox","superClass":["BoardElement"]},{"name":"RootElement","isAbstract":true,"superClass":["BoardElement"]},{"name":"Definitions","superClass":["BoardElement"],"properties":[{"name":"targetNamespace","isAttr":true,"type":"String"},{"name":"expressionLanguage","default":"http://www.w3.org/1999/XPath","isAttr":true,"type":"String"},{"name":"typeLanguage","default":"http://www.w3.org/2001/XMLSchema","isAttr":true,"type":"String"},{"name":"rootElements","type":"RootElement","isMany":true},{"name":"rootBoards","isMany":true,"type":"odDi:OdRootBoard"},{"name":"exporter","isAttr":true,"type":"String"},{"name":"exporterVersion","isAttr":true,"type":"String"}]}]}');
+module.exports = JSON.parse('{"name":"Object diagram","uri":"http://tk/schema/od","prefix":"od","xml":{"tagAlias":"lowerCase"},"types":[{"name":"BoardElement","isAbstract":true,"properties":[{"name":"name","isAttr":true,"type":"String"},{"name":"id","isAttr":true,"type":"String","isId":true}]},{"name":"Object","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Circle","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Link","superClass":["BoardElement"],"properties":[{"name":"type","isAttr":true,"type":"String"},{"name":"sourceRef","isAttr":true,"isReference":true,"type":"Object"},{"name":"targetRef","isAttr":true,"isReference":true,"type":"Object"}]},{"name":"OdBoard","superClass":["RootElement"],"properties":[{"name":"boardElements","isMany":true,"type":"BoardElement"}]},{"name":"TextBox","superClass":["BoardElement"]},{"name":"RootElement","isAbstract":true,"superClass":["BoardElement"]},{"name":"Definitions","superClass":["BoardElement"],"properties":[{"name":"targetNamespace","isAttr":true,"type":"String"},{"name":"expressionLanguage","default":"http://www.w3.org/1999/XPath","isAttr":true,"type":"String"},{"name":"typeLanguage","default":"http://www.w3.org/2001/XMLSchema","isAttr":true,"type":"String"},{"name":"rootElements","type":"RootElement","isMany":true},{"name":"rootBoards","isMany":true,"type":"odDi:OdRootBoard"},{"name":"exporter","isAttr":true,"type":"String"},{"name":"exporterVersion","isAttr":true,"type":"String"}]}]}');
 
 /***/ }),
 
@@ -59576,7 +59231,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var object_diagram_modeler_assets_odm_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! object-diagram-modeler/assets/odm.css */ "../assets/odm.css");
 /* harmony import */ var object_diagram_modeler_lib_Modeler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! object-diagram-modeler/lib/Modeler */ "../lib/Modeler.js");
 /* harmony import */ var _resources_emptyBoard_xml__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../resources/emptyBoard.xml */ "./resources/emptyBoard.xml");
-/* harmony import */ var _resources_sampleBoard2_xml__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../resources/sampleBoard2.xml */ "./resources/sampleBoard2.xml");
+/* harmony import */ var _resources_sampleBoard_xml__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../resources/sampleBoard.xml */ "./resources/sampleBoard.xml");
 
 
 
@@ -59757,7 +59412,7 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default()(function() {
 
 });
 
-openBoard(_resources_sampleBoard2_xml__WEBPACK_IMPORTED_MODULE_3__["default"]);
+openBoard(_resources_sampleBoard_xml__WEBPACK_IMPORTED_MODULE_3__["default"]);
 
 
 // helpers //////////////////////
