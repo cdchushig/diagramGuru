@@ -1121,6 +1121,18 @@ Viewer.prototype._moddleExtensions = {};
 
 /***/ }),
 
+/***/ "../lib/actor/index.js":
+/*!*****************************!*\
+  !*** ../lib/actor/index.js ***!
+  \*****************************/
+/***/ ((module) => {
+
+// inlined and base64 encoded ./actor.gif
+
+module.exports.dataURL = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDhweCIgaGVpZ2h0PSI0OHB4IiB2aWV3Qm94PSIwIDAgMjQgMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgYXJpYS1sYWJlbGxlZGJ5PSJhY2Nlc3NpYmlsaXR5SHVtYW5JY29uVGl0bGUiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiIGZpbGw9Im5vbmUiIGNvbG9yPSIjMDAwIj4gPHRpdGxlIGlkPSJhY2Nlc3NpYmlsaXR5SHVtYW5JY29uVGl0bGUiPkFjY2Vzc2liaWxpdHkgZmVhdHVyZXM8L3RpdGxlPiA8Y2lyY2xlIGN4PSIxMiIgY3k9IjMiIHI9IjEiLz4gPHBhdGggZD0iTTE2IDIxTDEyIDEzTTEyIDEzVjdNMTIgMTNMOCAyMU0xMiA3TDE4IDlNMTIgN0w2IDkiLz4gPC9zdmc+'
+
+/***/ }),
+
 /***/ "../lib/core/index.js":
 /*!****************************!*\
   !*** ../lib/core/index.js ***!
@@ -1161,13 +1173,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var inherits__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(inherits__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var min_dash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! min-dash */ "../node_modules/min-dash/dist/index.esm.js");
 /* harmony import */ var tiny_svg__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! tiny-svg */ "../node_modules/tiny-svg/dist/index.esm.js");
-/* harmony import */ var diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! diagram-js/lib/util/RenderUtil */ "../node_modules/diagram-js/lib/util/RenderUtil.js");
+/* harmony import */ var diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! diagram-js/lib/util/RenderUtil */ "../node_modules/diagram-js/lib/util/RenderUtil.js");
 /* harmony import */ var diagram_js_lib_draw_BaseRenderer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! diagram-js/lib/draw/BaseRenderer */ "../node_modules/diagram-js/lib/draw/BaseRenderer.js");
-/* harmony import */ var _features_label_editing_LabelUtil__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../features/label-editing/LabelUtil */ "../lib/features/label-editing/LabelUtil.js");
-/* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../util/ModelUtil */ "../lib/util/ModelUtil.js");
-/* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! min-dom */ "../node_modules/min-dom/dist/index.esm.js");
-/* harmony import */ var _ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ODRendererUtil */ "../lib/draw/ODRendererUtil.js");
+/* harmony import */ var _features_label_editing_LabelUtil__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../features/label-editing/LabelUtil */ "../lib/features/label-editing/LabelUtil.js");
+/* harmony import */ var _util_ModelUtil__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../util/ModelUtil */ "../lib/util/ModelUtil.js");
+/* harmony import */ var min_dom__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! min-dom */ "../node_modules/min-dom/dist/index.esm.js");
+/* harmony import */ var _actor__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../actor */ "../lib/actor/index.js");
+/* harmony import */ var _ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./ODRendererUtil */ "../lib/draw/ODRendererUtil.js");
 /* harmony import */ var ids__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ids */ "../node_modules/ids/dist/index.esm.js");
+
+
 
 
 
@@ -1259,15 +1274,17 @@ function ODRenderer(
       delete attrs.fillOpacity;
     }
 
-    var cx = width / 2,
-        cy = height / 2;
+    var cx = width / 2;
+    var cy = height / 2;
+    var cx1 = width / 4;
+    var cy1 = height / 4;
 
     var oval = (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.create)('ellipse');
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(oval, {
       cx: cx,
       cy: cy,
-      rx: width,
-      ry: cy
+      rx: width - cx,
+      ry: cy1
     });
 
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(oval, attrs);
@@ -1275,6 +1292,31 @@ function ODRenderer(
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, oval);
 
     return oval;
+  }
+
+  function drawActor(parentGfx, width, height, offset, attrs) {
+
+    if ((0,min_dash__WEBPACK_IMPORTED_MODULE_3__.isObject)(offset)) {
+      attrs = offset;
+      offset = 0;
+    }
+
+    offset = offset || 0;
+
+    var url = _actor__WEBPACK_IMPORTED_MODULE_5__.dataURL;
+
+    var actor = (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.create)('image', {
+      x: 0,
+      y: 0,
+      width: width,
+      height: height,
+      href: url
+    });
+
+    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(actor, attrs);
+    (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, actor);
+
+    return actor;
   }
 
   function drawRect(parentGfx, width, height, r, offset, attrs) {
@@ -1301,6 +1343,7 @@ function ODRenderer(
       rx: r,
       ry: r
     });
+
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.attr)(rect, attrs);
 
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, rect);
@@ -1433,7 +1476,7 @@ function ODRenderer(
   }
 
   function renderEmbeddedLabel(parentGfx, element, align, fontSize) {
-    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getSemantic)(element);
+    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getSemantic)(element);
 
     return renderLabel(parentGfx, semantic.name, {
       box: element,
@@ -1455,7 +1498,7 @@ function ODRenderer(
       y: element.height / 2 + element.y
     };
 
-    return renderLabel(parentGfx, (0,_features_label_editing_LabelUtil__WEBPACK_IMPORTED_MODULE_6__.getLabel)(element), {
+    return renderLabel(parentGfx, (0,_features_label_editing_LabelUtil__WEBPACK_IMPORTED_MODULE_7__.getLabel)(element), {
       box: box,
       fitBox: true,
       style: (0,min_dash__WEBPACK_IMPORTED_MODULE_3__.assign)(
@@ -1469,7 +1512,7 @@ function ODRenderer(
   }
 
   function renderAttributes(parentGfx, element) {
-    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getSemantic)(element);
+    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getSemantic)(element);
     if (semantic.attributeValues) {
       renderLabel(parentGfx, semantic.attributeValues, {
         box: {
@@ -1486,7 +1529,7 @@ function ODRenderer(
   }
 
   function renderAttributesGeneral(parentGfx, element) {
-    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getSemantic)(element);
+    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getSemantic)(element);
     if (semantic.attributeValues) {
       renderLabel(parentGfx, semantic.attributeValues, {
         box: {
@@ -1503,7 +1546,7 @@ function ODRenderer(
   }
 
   function renderAttributesGeneral2(parentGfx, element) {
-    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getSemantic)(element);
+    var semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getSemantic)(element);
     if (semantic.attributeValues) {
       renderLabel(parentGfx, semantic.attributeValues, {
         box: {
@@ -1524,7 +1567,7 @@ function ODRenderer(
       { x: 0, y: 30 },
       { x: element.width, y: 30 }
     ], {
-      stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+      stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
     });
   }
 
@@ -1535,7 +1578,7 @@ function ODRenderer(
       fill: 'none'
     });
 
-    var line = (0,diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_7__.createLine)(waypoints, attrs);
+    var line = (0,diagram_js_lib_util_RenderUtil__WEBPACK_IMPORTED_MODULE_8__.createLine)(waypoints, attrs);
 
     (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.append)(parentGfx, line);
 
@@ -1543,7 +1586,7 @@ function ODRenderer(
   }
 
   function renderTitelLabel(parentGfx, element) {
-    let semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getSemantic)(element);
+    let semantic = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getSemantic)(element);
     let text = '';
     if (semantic.name) {
       text = semantic.name;
@@ -1616,7 +1659,7 @@ function ODRenderer(
       orient: 'auto'
     });
 
-    var defs = (0,min_dom__WEBPACK_IMPORTED_MODULE_8__.query)('defs', canvas._svg);
+    var defs = (0,min_dom__WEBPACK_IMPORTED_MODULE_9__.query)('defs', canvas._svg);
 
     if (!defs) {
       defs = (0,tiny_svg__WEBPACK_IMPORTED_MODULE_4__.create)('defs');
@@ -1653,9 +1696,9 @@ function ODRenderer(
   this.handlers = {
     'od:Object': function(parentGfx, element, attrs) {
       var rect = drawRect(parentGfx, element.width, element.height, 0, (0,min_dash__WEBPACK_IMPORTED_MODULE_3__.assign)({
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
+        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
         fillOpacity: HIGH_FILL_OPACITY,
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
       }, attrs));
 
       addDivider(parentGfx, element);
@@ -1669,21 +1712,21 @@ function ODRenderer(
     'od:Link': function(parentGfx, element) {
       var pathData = createPathFromConnection(element);
 
-      var fill = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-          stroke = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor);
+      var fill = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
+          stroke = (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor);
 
       var attrs = {
         strokeLinejoin: 'round',
         markerEnd: marker(fill, stroke),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
       };
       return drawPath(parentGfx, pathData, attrs);
     },
     'od:Circle': function(parentGfx, element) {
 
       var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
       };
 
       if (!('fillOpacity' in attrs)) {
@@ -1700,8 +1743,8 @@ function ODRenderer(
     'od:Decision': function(parentGfx, element) {
 
       var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
       };
 
       if (!('fillOpacity' in attrs)) {
@@ -1718,8 +1761,8 @@ function ODRenderer(
     'od:Rectangle': function(parentGfx, element) {
 
       var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
       };
 
       if (!('fillOpacity' in attrs)) {
@@ -1736,8 +1779,8 @@ function ODRenderer(
     'od:Parallelogram': function(parentGfx, element) {
 
       var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
       };
 
       if (!('fillOpacity' in attrs)) {
@@ -1754,8 +1797,8 @@ function ODRenderer(
     'od:Oval': function(parentGfx, element) {
 
       var attrs = {
-        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getFillColor)(element, defaultFillColor),
-        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getStrokeColor)(element, defaultStrokeColor)
+        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
       };
 
       if (!('fillOpacity' in attrs)) {
@@ -1766,6 +1809,24 @@ function ODRenderer(
 
       renderEmbeddedLabel(parentGfx, element, 'center-middle');
       renderAttributesGeneral(parentGfx, element);
+
+      return rect;
+    },
+    'od:Actor': function(parentGfx, element) {
+
+      var attrs = {
+        fill: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getFillColor)(element, defaultFillColor),
+        stroke: (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getStrokeColor)(element, defaultStrokeColor)
+      };
+
+      if (!('fillOpacity' in attrs)) {
+        attrs.fillOpacity = DEFAULT_FILL_OPACITY;
+      }
+
+      var rect = drawActor(parentGfx, element.width, element.height, attrs);
+
+      // renderEmbeddedLabel(parentGfx, element, 'center-middle');
+      // renderAttributesGeneral(parentGfx, element);
 
       return rect;
     },
@@ -1801,7 +1862,7 @@ ODRenderer.$inject = [
 ];
 
 ODRenderer.prototype.canRender = function(element) {
-  return (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_9__.is)(element, 'od:BoardElement');
+  return (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_10__.is)(element, 'od:BoardElement');
 };
 
 ODRenderer.prototype.drawShape = function(parentGfx, element) {
@@ -1822,13 +1883,13 @@ ODRenderer.prototype.drawConnection = function(parentGfx, element) {
 
 ODRenderer.prototype.getShapePath = function(element) {
 
-  return (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_5__.getRectPath)(element);
+  return (0,_ODRendererUtil__WEBPACK_IMPORTED_MODULE_6__.getRectPath)(element);
 };
 
 // helpers //////////
 
 function getColor(element) {
-  var bo = (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_9__.getBusinessObject)(element);
+  var bo = (0,_util_ModelUtil__WEBPACK_IMPORTED_MODULE_10__.getBusinessObject)(element);
 
   return bo.color || element.color;
 }
@@ -7737,6 +7798,13 @@ PaletteProvider.prototype.getPaletteEntries = function(element) {
     };
   }
 
+  function createImage(event) {
+    var shape = elementFactory.createShape({
+      type: 'od:Cat'
+    });
+
+  }
+
   (0,min_dash__WEBPACK_IMPORTED_MODULE_0__.assign)(actions, {
     'hand-tool': {
       group: 'tools',
@@ -7795,6 +7863,10 @@ PaletteProvider.prototype.getPaletteEntries = function(element) {
     'create-oval': createAction(
       'od:Oval', 'od-elements', 'pjs-ellipse',
       translate('Create Oval')
+    ),
+    'create-actor': createAction(
+      'od:Actor', 'od-elements', 'pjs-actor',
+      translate('Create Actor')
     ),
     'object-linker': {
       group: 'od-elements',
@@ -8192,7 +8264,7 @@ function canCreate(shape, target, source, position) {
 }
 
 function canResize(shape, newBounds) {
-  if ((0,_modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_5__.isAny)(shape, [ 'od:Object', 'od:Circle', 'od:Decision', 'od:Rectangle', 'od:Oval', 'od:Parallelogram' ])) {
+  if ((0,_modeling_util_ModelingUtil__WEBPACK_IMPORTED_MODULE_5__.isAny)(shape, [ 'od:Object', 'od:Circle', 'od:Decision', 'od:Rectangle', 'od:Oval', 'od:Parallelogram', 'od:Actor'])) {
     return !newBounds || (newBounds.width >= 50 && newBounds.height >= 50);
   }
   return false;
@@ -47654,7 +47726,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _font_awesome_5_29f589f173dcc69ef6c805b711894998_svg__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./font-awesome-5/29f589f173dcc69ef6c805b711894998.svg */ "../assets/font-awesome-5/29f589f173dcc69ef6c805b711894998.svg");
 /* harmony import */ var _icons_ellipse_svg__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./icons/ellipse.svg */ "../assets/icons/ellipse.svg");
 /* harmony import */ var _icons_parallelogram_svg__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./icons/parallelogram.svg */ "../assets/icons/parallelogram.svg");
+/* harmony import */ var _icons_actor_svg__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./icons/actor.svg */ "../assets/icons/actor.svg");
 // Imports
+
 
 
 
@@ -47682,8 +47756,9 @@ var ___CSS_LOADER_URL_REPLACEMENT_5___ = _starter_node_modules_css_loader_dist_r
 var ___CSS_LOADER_URL_REPLACEMENT_6___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_font_awesome_5_29f589f173dcc69ef6c805b711894998_svg__WEBPACK_IMPORTED_MODULE_11__["default"], { hash: "#Font Awesome 5 Free Solid" });
 var ___CSS_LOADER_URL_REPLACEMENT_7___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_icons_ellipse_svg__WEBPACK_IMPORTED_MODULE_12__["default"]);
 var ___CSS_LOADER_URL_REPLACEMENT_8___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_icons_parallelogram_svg__WEBPACK_IMPORTED_MODULE_13__["default"]);
+var ___CSS_LOADER_URL_REPLACEMENT_9___ = _starter_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_5___default()(_icons_actor_svg__WEBPACK_IMPORTED_MODULE_14__["default"]);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "@font-face {\n  font-family: \"IBM Plex\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + "); /* IE9*/\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_3___ + ") format(\"woff2\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_4___ + ") format(\"woff\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_5___ + ") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_6___ + ") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.pjs-ellipse {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_7___ + ");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-parallelogram {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_8___ + ");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n", "",{"version":3,"sources":["webpack://./../assets/odm.css"],"names":[],"mappings":"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","sourcesContent":["@import '../node_modules/diagram-js/assets/diagram-js.css';\n@import '../node_modules/bpmn-font/dist/css/bpmn.css';\n@import url('./css/od.css');\n\n@font-face {\n  font-family: \"IBM Plex\";\n  src: url(\"./ibm-plex-font/IBMPlexSans-Regular.ttf\");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot\"); /* IE9*/\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot?#iefix\") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff2\") format(\"woff2\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff\") format(\"woff\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.ttf\") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.svg#Font Awesome 5 Free Solid\") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.pjs-ellipse {\n  background-image: url(\"./icons/ellipse.svg\");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-parallelogram {\n  background-image: url(\"./icons/parallelogram.svg\");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "@font-face {\n  font-family: \"IBM Plex\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + "); /* IE9*/\n  src: url(" + ___CSS_LOADER_URL_REPLACEMENT_2___ + ") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_3___ + ") format(\"woff2\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_4___ + ") format(\"woff\"), /* chrome、firefox */\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_5___ + ") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(" + ___CSS_LOADER_URL_REPLACEMENT_6___ + ") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.pjs-ellipse {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_7___ + ");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-parallelogram {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_8___ + ");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-actor {\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_9___ + ");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n", "",{"version":3,"sources":["webpack://./../assets/odm.css"],"names":[],"mappings":"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","sourcesContent":["@import '../node_modules/diagram-js/assets/diagram-js.css';\n@import '../node_modules/bpmn-font/dist/css/bpmn.css';\n@import url('./css/od.css');\n\n@font-face {\n  font-family: \"IBM Plex\";\n  src: url(\"./ibm-plex-font/IBMPlexSans-Regular.ttf\");\n  font-display: swap;\n}\n\n@font-face {font-family: \"Font Awesome 5 Free Solid\";\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot\"); /* IE9*/\n  src: url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.eot?#iefix\") format(\"embedded-opentype\"), /* IE6-IE8 */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff2\") format(\"woff2\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.woff\") format(\"woff\"), /* chrome、firefox */\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.ttf\") format(\"truetype\"), /* chrome、firefox、opera、Safari, Android, iOS 4.2+*/\n  url(\"./font-awesome-5/29f589f173dcc69ef6c805b711894998.svg#Font Awesome 5 Free Solid\") format(\"svg\"); /* iOS 4.1- */\n}\n\n\n/* OVERWRITING Diagram.js */\n.djs-palette {\n  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.2) !important;\n}\n\n/* General */\nbutton {\n  border: none;\n  background: none;\n}\n\nul {\n  padding: 0;\n  margin: 0;\n  list-style-type: none;\n}\n\nbutton:hover, a:hover {\n  cursor: pointer;\n}\n\n.pjs-error {\n  color: #ff0000;\n}\n\n.pjs-visible {\n  display: block !important;\n}\n\n.pjs-first {\n  /* DONT CHANGE. USED AS PSEUDOCLASS */\n}\n\n.pjs-buttons {\n  position: fixed;\n}\n\n.pjs-buttons > ul {\n  display: block;\n  padding: 0;\n  margin: 0;\n  margin-top: 10px;\n  list-style: none;\n}\n\n.pjs-buttons > ul > li {\n  display: inline-block;\n  margin-right: 10px;\n}\n\n.pjs-buttons > ul > li > a, .pjs-buttons button {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  padding: 6px 10px;\n  font-size: 13px;\n  font-weight: bold;\n  text-align: center;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-buttons button:hover {\n  cursor: pointer;\n}\n\n.pjs-buttons a {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-button-disabled,\n.pjs-button-disabled:hover,\n.pjs-button-disabled:active {\n  opacity: 0.3;\n  text-decoration: none;\n}\n\n.pjs-buttons a.pjs-buttons-active, .pjs-buttons button.pjs-buttons-active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n/* tool tip */\n\n.pjs-tooltip {\n  position: relative;\n  display: inline-block;\n  border-bottom: 1px dotted black;\n}\n\n.pjs-tooltip .pjs-tooltiptext {\n  font-family: 'IBM Plex Sans', sans-serif;\n  visibility: hidden;\n  width: 120px;\n  background-color: black;\n  color: #fff;\n  text-align: center;\n  border-radius: 6px;\n  padding: 5px 0;\n  padding: 20px;\n  position: absolute;\n  z-index: 1;\n  bottom: 100%;\n  left: 50%;\n  margin-left: -60px;\n\n  /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */\n  opacity: 0;\n  transition: opacity 1s;\n}\n\n.pjs-tooltip:hover .pjs-tooltiptext {\n  visibility: visible;\n  opacity: 1;\n}\n\n.pjs-tooltip .pjs-tooltiptext::after {\n  content: \" \";\n  position: absolute;\n  top: 100%; /* At the bottom of the tooltip */\n  left: 50%;\n  margin-left: -5px;\n  border-width: 5px;\n  border-style: solid;\n  border-color: black transparent transparent transparent;\n}\n\n/* canvas drawing */\n\n.pjs-ellipse {\n  background-image: url(\"./icons/ellipse.svg\");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-parallelogram {\n  background-image: url(\"./icons/parallelogram.svg\");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.pjs-actor {\n  background-image: url(\"./icons/actor.svg\");\n  background-repeat: no-repeat;\n  background-size: cover;\n  margin: 8px 8px 4px 8px;\n  width: 32px !important;\n  height: 32px !important;\n}\n\n.od-no-font-icon-object {\n  /* We use this in the context pad because the icon from the font is not scaled properly. TODO Tim: Investigate this */\n  content: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23000' stroke-width='1.5' width='46' height='46'%3E%3Crect x='10' y='13' width='26' height='20'/%3E%0Astroke='black' /%3E%3Cline x1='10' y1='19' x2='36' y2='19' stroke='black' /%3E%3C/svg%3E\");\n}\n\n.pjs-text-box:before {\n  content: 'Abc';\n  font-size: medium;\n}\n\n.pjs-horizontal {\n  display: inline-block;\n}\n\n.pjs-horizontal li {\n  float: left;\n}\n\n[class*=\" pjs-general-icon\"]::before {\n    font-style: normal;\n    font-weight: normal;\n    speak: none;\n    display: inline-block;\n    text-decoration: inherit;\n    text-align: center;\n    font-variant: normal;\n    text-transform: none;\n}\n\n.pjs-general-icon {\n  font-family: \"Font Awesome 5 Free Solid\";\n  line-height: 1.2em;\n}\n\n.pjs-ui-element-bordered {\n  color: black;\n  background-color: #f8f8f8;\n  border-radius: 3px;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\n.pjs-io-dialog-text-hint {\n  margin-top: 4px;\n  font-size: 13px;\n  text-align: left;\n  color:#555555;\n}\n\n.pjs-io-dialog-text-hint .pjs-tooltip .pjs-tooltiptext  {\n    margin-left: -80px !important;\n}\n\n/* flex box grid */\n\n.pjs-row {\n  box-sizing: border-box;\n  display: -webkit-box;\n  display: -ms-flexbox;\n  display: flex;\n  -webkit-box-flex: 0;\n  -ms-flex: 0 1 auto;\n  flex: 0 1 auto;\n  -webkit-box-orient: horizontal;\n  -webkit-box-direction: normal;\n  -ms-flex-direction: row;\n  flex-direction: row;\n  -ms-flex-wrap: wrap-reverse;\n  flex-wrap: wrap-reverse;\n}\n\n.pjs-col-xs {\n  -webkit-box-flex: 1;\n  -ms-flex-positive: 1;\n  flex-grow: 1;\n  -ms-flex-preferred-size: 0;\n  flex-basis: 0;\n  max-width: 100%;\n  box-sizing: border-box;\n}\n\n.pjs-box, .pjs-box-first, .pjs-box-large, .pjs-box-nested, .pjs-box-row {\n  position: relative;\n  box-sizing: border-box;\n  min-height: 1rem;\n  margin-bottom: 0;\n  border: 1px solid #FFF;\n  border-radius: 2px;\n  overflow: hidden;\n  text-align: center;\n  color: #fff;\n}\n\n.pjs-text {\n    color: black;\n    font-size: 13px;\n    font-weight: bold;\n}\n\n.pjs-ui-element {\n  color: black;\n  background-color: #f8f8f8;\n  display: inline-block;\n  font-size: 13px;\n  border: solid 1px #cdcdcd;\n}\n\nbutton:hover {\n  cursor: pointer;\n}\n\ninput, textarea {\n  width: 100%;\n  text-align: left;\n  padding: 6px 10px;\n  -moz-box-sizing: border-box;\n  -webkit-box-sizing: border-box;\n  box-sizing: border-box;\n}\n\n.pjs-labeled-input {\n  position:relative;\n}\n\n.pjs-section-spacer {\n  width: 100%;\n  height: 1px;\n  background-color: #555555;\n}\n\n.pjs-io-dialog {\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n  z-index: 1001;\n}\n\n.pjs-io-dialog.pjs-io-dialog-open::before {\n  content: '';\n  position: fixed;\n  left: 0;\n  top: 0;\n  bottom: 0;\n  right: 0;\n  background: #666;\n  opacity: 0.2;\n  z-index: 1001;\n}\n\n.pjs-io-dialog .pjs-io-dialog-content {\n  background: white;\n  z-index: 1001;\n  position: fixed;\n  width: 600px;\n  left: 50%;\n  margin-left: -300px;\n  top: 100px;\n  background: white;\n  padding: 10px 30px 20px 30px;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n }\n\n.pjs-io-dialog-section {\n  padding-top:10px;\n}\n\n.pjs-io-dialog-section.pjs-first {\n  padding-top:0px;\n}\n\n.pjs-io-dialog-local {\n  padding: 10px;\n  background: white;\n  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);\n  border-radius: 2px;\n  height: auto;\n}\n\n.pjs-io-dialog-local .pjs-box-row {\n  min-width: 40px;\n}\n\n.pjs-io-dialog-local .pjs-box-row img {\n  width: 100%;\n  max-width: 100px;\n  object-fit: fill;\n  vertical-align: middle;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper {\n  position: relative;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button {\n  width: 100%;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:hover {\n  color: #555;\n}\n\n.pjs-buttons.pjs-image-selection-submit-wrapper button:active {\n  opacity: 1.0;\n  box-shadow: 0px 2px 2px 0 rgba(0, 0, 0, 0.1);\n}\n\n\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -48091,6 +48166,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "0519459d8ed646e0f90de040a2f1fa2b.ttf");
+
+/***/ }),
+
+/***/ "../assets/icons/actor.svg":
+/*!*********************************!*\
+  !*** ../assets/icons/actor.svg ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "f1792f58baa2b25e46c6d0865c2e004f.svg");
 
 /***/ }),
 
@@ -59448,7 +59538,7 @@ module.exports = JSON.parse('{"name":"dc","uri":"http://www.omg.org/spec/DD/2010
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"Object diagram","uri":"http://tk/schema/od","prefix":"od","xml":{"tagAlias":"lowerCase"},"types":[{"name":"BoardElement","isAbstract":true,"properties":[{"name":"name","isAttr":true,"type":"String"},{"name":"id","isAttr":true,"type":"String","isId":true}]},{"name":"Object","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Circle","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Decision","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Rectangle","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Parallelogram","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Oval","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Link","superClass":["BoardElement"],"properties":[{"name":"type","isAttr":true,"type":"String"},{"name":"sourceRef","isAttr":true,"isReference":true,"type":"Object"},{"name":"targetRef","isAttr":true,"isReference":true,"type":"Object"}]},{"name":"OdBoard","superClass":["RootElement"],"properties":[{"name":"boardElements","isMany":true,"type":"BoardElement"}]},{"name":"TextBox","superClass":["BoardElement"]},{"name":"RootElement","isAbstract":true,"superClass":["BoardElement"]},{"name":"Definitions","superClass":["BoardElement"],"properties":[{"name":"targetNamespace","isAttr":true,"type":"String"},{"name":"expressionLanguage","default":"http://www.w3.org/1999/XPath","isAttr":true,"type":"String"},{"name":"typeLanguage","default":"http://www.w3.org/2001/XMLSchema","isAttr":true,"type":"String"},{"name":"rootElements","type":"RootElement","isMany":true},{"name":"rootBoards","isMany":true,"type":"odDi:OdRootBoard"},{"name":"exporter","isAttr":true,"type":"String"},{"name":"exporterVersion","isAttr":true,"type":"String"}]}]}');
+module.exports = JSON.parse('{"name":"Object diagram","uri":"http://tk/schema/od","prefix":"od","xml":{"tagAlias":"lowerCase"},"types":[{"name":"BoardElement","isAbstract":true,"properties":[{"name":"name","isAttr":true,"type":"String"},{"name":"id","isAttr":true,"type":"String","isId":true}]},{"name":"Object","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Circle","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Decision","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Rectangle","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Parallelogram","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Oval","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Actor","superClass":["BoardElement"],"properties":[{"name":"attributeValues","isAttr":true,"type":"String"},{"name":"links","isMany":true,"type":"Link","isReference":true}]},{"name":"Link","superClass":["BoardElement"],"properties":[{"name":"type","isAttr":true,"type":"String"},{"name":"sourceRef","isAttr":true,"isReference":true,"type":"Object"},{"name":"targetRef","isAttr":true,"isReference":true,"type":"Object"}]},{"name":"OdBoard","superClass":["RootElement"],"properties":[{"name":"boardElements","isMany":true,"type":"BoardElement"}]},{"name":"TextBox","superClass":["BoardElement"]},{"name":"RootElement","isAbstract":true,"superClass":["BoardElement"]},{"name":"Definitions","superClass":["BoardElement"],"properties":[{"name":"targetNamespace","isAttr":true,"type":"String"},{"name":"expressionLanguage","default":"http://www.w3.org/1999/XPath","isAttr":true,"type":"String"},{"name":"typeLanguage","default":"http://www.w3.org/2001/XMLSchema","isAttr":true,"type":"String"},{"name":"rootElements","type":"RootElement","isMany":true},{"name":"rootBoards","isMany":true,"type":"odDi:OdRootBoard"},{"name":"exporter","isAttr":true,"type":"String"},{"name":"exporterVersion","isAttr":true,"type":"String"}]}]}');
 
 /***/ }),
 
