@@ -22,7 +22,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .forms import UploadFileForm, NewUserForm
+from .forms import UploadFileForm, NewUserForm, NewModelForm
 from .models import Diagram
 from .serializers import DiagramSerializer
 from .app_consts import Consts
@@ -111,6 +111,23 @@ def signup(request):
     return render(request=request, template_name="signup.html", context={"register_form": form})
 
 
+def save_model(request):
+
+    if request.method == "POST":
+        form = NewModelForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            messages.success(request, "Registration successful." )
+            return redirect("/list_diagram")
+
+        messages.error(request, "Unsuccessful registration. Invalid information.")
+
+    form = NewUserForm()
+
+    return render(request=request, template_name="save_model.html", context={"register_form": form})
+
+
 def show_dashboard(request):
     return render(request, "dashboard.html", context={})
 
@@ -120,7 +137,7 @@ def create_model(request):
     with open(bpmn_filename, 'r') as f:
         bpmn_file_content = f.read()
     context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
-    template = 'modeler/modeler.html'
+    template = 'modeler/modeler_oc.html'
     return render(request, template, context)
 
 
