@@ -4,7 +4,7 @@ db.sqlite3
 *.h5
 *.hdf5
 *.csv
-*.bpmn
+#*.bpmn
 *.jpg
 *.jpeg
 *.png
@@ -21,3 +21,4 @@ diagram_detector/results/*
 diagram_detector/dataset/*
 bpmn_python_lib2/images_input/*
 bpmn_python_lib2/images_output/*
+bpmn_python_lib2/tests/*
