@@ -459,6 +459,12 @@ def do_cmd_to_shell_diagram_detector(diagram_path_filename):
 
     logger.info("path_diagram_guru_project: %s", PATH_DIAGRAM_GURU_PROJECT)
 
+    cmd_python_version = [PATH_VENV_DIAGRAM_GURU + "python --version"]
+    process = subprocess.Popen(cmd_python_version, stdout=subprocess.PIPE, stderr=None)
+    cmd_output_python_version = process.communicate()
+
+    print(cmd_output_python_version[0].decode("utf-8"))
+
     cmd_diagram_detector = [PATH_VENV_DIAGRAM_GURU + "python", script_path_filename,
                             "--diagram_filename", diagram_path_filename,
                             "--display_image", "True"]
