@@ -47,6 +47,7 @@ DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
 PATH_DIR_UPLOADS = PATH_DIAGRAM_GURU_PROJECT + "/uploads/"
 PATH_DIR_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
+PATH_VENV_DIAGRAM_GURU = ''
 
 BPMN_MODEL_NS = 'http://www.omg.org/spec/BPMN/20100524/MODEL'
 DIAG_INTERCHANGE_NS = "http://www.omg.org/spec/BPMN/20100524/DI"
@@ -229,13 +230,12 @@ def handle_uploaded_file(diagram_file_uploaded):
     diagram_path_filename_unique_id = PATH_DIR_UPLOADS + diagram_filename_unique_id + ext_file
     save_file_uploaded(diagram_file_uploaded, diagram_path_filename_unique_id)
 
-    # dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
+    dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
 
-    diagram_img = cv2.imread(diagram_path_filename_unique_id)
-    is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img)
-    img_bytes = im_buf_arr.tobytes()
-
-    dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, diagram_path_filename_unique_id)
+    # diagram_img = cv2.imread(diagram_path_filename_unique_id)
+    # is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img)
+    # img_bytes = im_buf_arr.tobytes()
+    # dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, diagram_path_filename_unique_id)
 
     if dict_diagram_objects:
         diagram_graph, list_diagram_nodes_ordered = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
@@ -250,7 +250,8 @@ def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
     # list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
     type_diagram_element = diagram_node.get_type()
     logger.info('Added diagram object: %s', type_diagram_element)
-    text_element = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+    # text_element = ''.join(random.choice(string.ascii_lowercase) for i in range(5))
+    text_element = ''
 
     if type_diagram_element == 'start_end':
         return bpmn_graph.add_start_event_to_diagram(process_id, start_event_name=text_element)
@@ -458,7 +459,7 @@ def do_cmd_to_shell_diagram_detector(diagram_path_filename):
 
     logger.info("path_diagram_guru_project: %s", PATH_DIAGRAM_GURU_PROJECT)
 
-    cmd_diagram_detector = ["python", script_path_filename,
+    cmd_diagram_detector = [PATH_VENV_DIAGRAM_GURU + "python", script_path_filename,
                             "--diagram_filename", diagram_path_filename,
                             "--display_image", "True"]
 
