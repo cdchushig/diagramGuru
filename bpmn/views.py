@@ -42,7 +42,7 @@ class DiagramCreateView(BSModalCreateView):
 
 
 def modeler(request):
-    return render(request, template_name='modeler.html')
+    return render(request, template_name='modeler_oc.html')
 
 
 # def list_diagram(request):
@@ -115,7 +115,7 @@ def open_external_diagram(request):
 
     logger.info('Loaded xml file: %s', request.session.get('diagram_name'))
 
-    return render(request, 'modeler.html', context)
+    return render(request, 'modeler_oc.html', context)
 
 
 def delete_diagram(request, id):

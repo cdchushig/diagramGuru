@@ -94,6 +94,11 @@
           New diagram
         </button>
       </li>
+      <li>
+        <button id="js-open-new2" href class="pjs-buttons-active" title="open new board">
+          Save diagram
+        </button>
+      </li>
     </ul>
 
     <ul>
@@ -112,5 +117,16 @@
       </li>
     </ul>
   </div>
-  <script src="{% static 'app/js/app.js' %}"></script>
+<script src="{% static 'app/js/app.js' %}"></script>
+<script>
+  $(document).on("click", ".open-incident", function (e) {
+    e.preventDefault();
+    var $popup = $("#popup");
+    var popup_url = $(this).data("popup-url");
+    $(".modal-body", $popup).load(popup_url, function () {
+      $popup.modal("show");
+    });
+  });
+</script>
+</body>
 </html>
