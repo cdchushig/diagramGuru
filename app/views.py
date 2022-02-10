@@ -196,7 +196,6 @@ def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_uniq
 
     try:
         dict_objects = response.json()
-        logger.info(dict_objects)
     except requests.exceptions.RequestException:
         logger.error('Error in response from api')
         logger.error(response.text)
@@ -250,11 +249,13 @@ def handle_uploaded_file(diagram_file_uploaded):
     img_bytes = im_buf_arr.tobytes()
     dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, diagram_path_filename_unique_id)
 
-    create_xml_file(dict_diagram_objects)
-
     if dict_diagram_objects:
-        diagram_graph, list_diagram_nodes_ordered = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
-        transform_graph_to_bpmn(diagram_graph, list_diagram_nodes_ordered, diagram_filename_unique_id)
+        # diagram_graph, list_diagram_nodes_ordered = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
+        # transform_graph_to_bpmn(diagram_graph, list_diagram_nodes_ordered, diagram_filename_unique_id)
+        xml_str = create_xml_file(dict_diagram_objects)
+        root = etree.fromstring(xml_str)
+        et = etree.ElementTree(root)
+        et.write(PATH_DIR_DIAGRAMS + diagram_filename_unique_id + '.xml', pretty_print=True)
     else:
         logger.error('No objects in diagram recognized!')
 
@@ -321,8 +322,12 @@ def create_xml_file(dict_nodes):
         od_di_shape.append(em_bound)
         od_di_plane.append(od_di_shape)
 
-    print(etree.tostring(od_root, pretty_print=True, xml_declaration=True, encoding='utf-8'))
-    print(etree.dump(od_root))
+    # print(type(etree.tostring(od_root, pretty_print=True, xml_declaration=True, encoding='utf-8')))
+    # print(etree.dump(od_root))
+
+    xml_str = etree.tostring(od_root, pretty_print=True, xml_declaration=True, encoding='utf-8')
+
+    return xml_str
 
 
 def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
