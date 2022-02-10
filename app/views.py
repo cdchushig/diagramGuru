@@ -7,9 +7,9 @@ import requests
 import subprocess
 import itertools as it
 import operator
-
 import random
 import string
+import ast
 
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login
@@ -42,6 +42,7 @@ from bpmn_python_lib2.bpmn_python.bpmn_diagram_layouter import generate_layout
 from bpmn_python_lib2.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
 
 from lxml import etree
+from lxml.builder import ElementMaker
 
 DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
@@ -53,6 +54,15 @@ BPMN_MODEL_NS = 'http://www.omg.org/spec/BPMN/20100524/MODEL'
 DIAG_INTERCHANGE_NS = "http://www.omg.org/spec/BPMN/20100524/DI"
 DIAG_COMMON_NS = "http://www.omg.org/spec/DD/20100524/DC"
 
+NUM_RAND_DIGITS = 7
+
+NSMAP = {
+    "od": 'http://tk/schema/od',
+    "odDi": 'http://tk/schema/odDi',
+    "dc": 'http://www.omg.org/spec/DD/20100524/DC'
+}
+
+LIST_DIAGRAM_ELEMENTS = [Consts.ACTOR, Consts.OVAL]
 list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
 
 import logging
@@ -119,7 +129,7 @@ def save_model(request):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, "Registration successful." )
+            messages.success(request, "Registration successful.")
             return redirect("/list_diagram")
 
         messages.error(request, "Unsuccessful registration. Invalid information.")
@@ -176,14 +186,17 @@ def do_request_to_api_diagram_detector(img_bytes, diagram_filename_uploaded_uniq
     :param diagram_filename_uploaded_unique_id_with_extension:
     :return:
     """
+    diagram_filename = diagram_filename_uploaded_unique_id_with_extension.split('/')[-1]
     im_b64 = base64.b64encode(img_bytes).decode("utf8")
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    payload = json.dumps({"image": im_b64, "diagram_name": diagram_filename_uploaded_unique_id_with_extension})
-    response = requests.post(Consts.api_url, data=payload, headers=headers)
+    payload = json.dumps({"image": im_b64, "diagram_name": diagram_filename})
+    response = requests.post(Consts.API_URL, data=payload, headers=headers)
+
+    dict_objects = {}
 
     try:
         dict_objects = response.json()
-        # logger.info(dict_objects)
+        logger.info(dict_objects)
     except requests.exceptions.RequestException:
         logger.error('Error in response from api')
         logger.error(response.text)
@@ -230,12 +243,14 @@ def handle_uploaded_file(diagram_file_uploaded):
     diagram_path_filename_unique_id = PATH_DIR_UPLOADS + diagram_filename_unique_id + ext_file
     save_file_uploaded(diagram_file_uploaded, diagram_path_filename_unique_id)
 
-    dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
+    # dict_diagram_objects = do_cmd_to_shell_diagram_detector(diagram_path_filename_unique_id)
 
-    # diagram_img = cv2.imread(diagram_path_filename_unique_id)
-    # is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img)
-    # img_bytes = im_buf_arr.tobytes()
-    # dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, diagram_path_filename_unique_id)
+    diagram_img = cv2.imread(diagram_path_filename_unique_id)
+    is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img)
+    img_bytes = im_buf_arr.tobytes()
+    dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, diagram_path_filename_unique_id)
+
+    create_xml_file(dict_diagram_objects)
 
     if dict_diagram_objects:
         diagram_graph, list_diagram_nodes_ordered = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
@@ -244,6 +259,70 @@ def handle_uploaded_file(diagram_file_uploaded):
         logger.error('No objects in diagram recognized!')
 
     return diagram_filename_unique_id
+
+
+def generate_random_id(size, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+
+def create_xml_file(dict_nodes):
+
+    # Add both namespaces and nsmap
+    elem_maker_od = ElementMaker(namespace=NSMAP["od"], nsmap=NSMAP)
+    elem_maker_od_di = ElementMaker(namespace=NSMAP["odDi"], nsmap=NSMAP)
+    elem_maker_dc = ElementMaker(namespace=NSMAP["dc"], nsmap=NSMAP)
+
+    # Create root element
+    od_root = elem_maker_od.definitions()
+
+    # Create both od and odDi elements
+    od_board = elem_maker_od.odBoard(id='Board_debug')
+    od_di_board = elem_maker_od_di.odRootBoard(id='RootBoard_debug')
+
+    # Link od and odDi to root
+    od_root.append(od_board)
+    od_root.append(od_di_board)
+
+    # Add nodes to xml
+    list_id_nodes = []
+    for diagram_node in dict_nodes["nodes"]:
+        if diagram_node["pred_class_name"] in LIST_DIAGRAM_ELEMENTS:
+            id_rand_node = generate_random_id(NUM_RAND_DIGITS)
+            if diagram_node["pred_class_name"] == Consts.OBJECT:
+                id_diagram_node = "{0}_{1}".format(Consts.OBJECT.capitalize(), id_rand_node)
+                od_board.append(elem_maker_od.object(id=id_diagram_node))
+            elif diagram_node["pred_class_name"] == Consts.DECISION:
+                id_diagram_node = "{0}_{1}".format(Consts.DECISION.capitalize(), id_rand_node)
+                od_board.append(elem_maker_od.decision(id=id_diagram_node))
+            elif diagram_node["pred_class_name"] == Consts.CIRCLE:
+                id_diagram_node = "{0}_{1}".format(Consts.CIRCLE.capitalize(), id_rand_node)
+                od_board.append(elem_maker_od.circle(id=id_diagram_node))
+            elif diagram_node["pred_class_name"] == Consts.OVAL:
+                id_diagram_node = "{0}_{1}".format(Consts.OVAL.capitalize(), id_rand_node)
+                od_board.append(elem_maker_od.oval(id=id_diagram_node))
+            elif diagram_node["pred_class_name"] == Consts.ACTOR:
+                id_diagram_node = "{0}_{1}".format(Consts.ACTOR.capitalize(), id_rand_node)
+                od_board.append(elem_maker_od.actor(id=id_diagram_node))
+            else:
+                id_diagram_node = "None"
+            pred_box = ast.literal_eval(diagram_node["pred_box"])
+            x = pred_box[0]
+            y = pred_box[1]
+            w = pred_box[2] - pred_box[0]
+            h = pred_box[3] - pred_box[1]
+            list_id_nodes.append((id_diagram_node, x, y, w, h))
+
+    od_di_plane = elem_maker_od_di.odPlane(id='Plane_debug', boardElement='Board_debug')
+    od_di_board.append(od_di_plane)
+
+    for d_node in list_id_nodes:
+        em_bound = elem_maker_dc.Bounds(x=str(d_node[1]), y=str(d_node[2]), width=str(d_node[3]), height=str(d_node[4]))
+        od_di_shape = elem_maker_od_di.odShape(id=d_node[0] + '_di', boardElement=d_node[0])
+        od_di_shape.append(em_bound)
+        od_di_plane.append(od_di_shape)
+
+    print(etree.tostring(od_root, pretty_print=True, xml_declaration=True, encoding='utf-8'))
+    print(etree.dump(od_root))
 
 
 def create_bpmn_graph_element(diagram_node, process_id, bpmn_graph):
@@ -475,3 +554,4 @@ def do_cmd_to_shell_diagram_detector(diagram_path_filename):
         dict_objects = {}
 
     return dict_objects
+
