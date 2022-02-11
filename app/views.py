@@ -1,5 +1,5 @@
 import os
-
+import numpy as np
 from datetime import datetime
 import base64
 import json
@@ -14,7 +14,7 @@ import ast
 from django.http import HttpResponseRedirect
 from django.contrib.auth import authenticate, login
 from django.conf import settings
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
 
@@ -22,19 +22,21 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
+from shapely.geometry import Point, LineString
 from .forms import UploadFileForm, NewUserForm, NewModelForm
 from .models import Diagram
 from .serializers import DiagramSerializer
 from .app_consts import Consts
+from .diagram_node import DiagramNode
+from .diagram_edge import DiagramEdge
+from .diagram_shape import DiagramShape
 
 from PIL import Image
-from pdf2image import convert_from_path, convert_from_bytes
+from pdf2image import convert_from_path
 
 import networkx as nx
-from xml.etree.ElementTree import tostring
 import cv2
 
-from .diagram_node import DiagramNode
 from app.diagram_utils import compute_distance_between_nodes
 
 from bpmn_python_lib2.bpmn_python.bpmn_diagram_export import BpmnDiagramGraphExport
@@ -43,6 +45,7 @@ from bpmn_python_lib2.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGra
 
 from lxml import etree
 from lxml.builder import ElementMaker
+from xml.etree.ElementTree import tostring
 
 DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
@@ -62,7 +65,7 @@ NSMAP = {
     "dc": 'http://www.omg.org/spec/DD/20100524/DC'
 }
 
-LIST_DIAGRAM_ELEMENTS = [Consts.ACTOR, Consts.OVAL]
+LIST_DIAGRAM_ELEMENTS = [Consts.ACTOR, Consts.OVAL, Consts.LINE, Consts.ARROW]
 list_diagram_types_allowed = ['process', 'decision', 'start_end', 'scan']
 
 import logging
@@ -248,25 +251,101 @@ def handle_uploaded_file(diagram_file_uploaded):
     is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img)
     img_bytes = im_buf_arr.tobytes()
     dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, diagram_path_filename_unique_id)
+    dict_diagram_objects_complete = complete_dict_diagram_objects(dict_diagram_objects)
 
     if dict_diagram_objects:
         # diagram_graph, list_diagram_nodes_ordered = create_graph_from_list_nodes(dict_diagram_objects, verbose=1)
         # transform_graph_to_bpmn(diagram_graph, list_diagram_nodes_ordered, diagram_filename_unique_id)
-        xml_str = create_xml_file(dict_diagram_objects)
-        root = etree.fromstring(xml_str)
-        et = etree.ElementTree(root)
-        et.write(PATH_DIR_DIAGRAMS + diagram_filename_unique_id + '.xml', pretty_print=True)
+        xml_str = create_str_xml_file(dict_diagram_objects, diagram_filename_unique_id)
     else:
         logger.error('No objects in diagram recognized!')
 
     return diagram_filename_unique_id
 
 
-def generate_random_id(size, chars=string.ascii_lowercase + string.digits):
+def complete_dict_diagram_objects(dict_diagram_objects):
+
+    list_diagram_nodes = dict_diagram_objects["nodes"]
+    print('holi')
+
+
+def compute_shortest_distance_v2(p, a, b):
+    """"
+    Compute shortest distance from point to line segment
+    - p: np.array of shape (x, 2)
+    - a: np.array of shape (x, 2)
+    - b: np.array of shape (x, 2)
+    """
+    # A = np.array([1, 0])
+    # B = np.array([3, 0])
+    # C = np.array([0, 1])
+
+    l = LineString([a, b])
+    p = Point(p)
+
+    return l.distance(p)
+
+
+def compute_shortest_distance_v1(p, a, b):
+    """Cartesian distance from point to line segment
+
+    Edited to support arguments as series, from:
+    https://stackoverflow.com/a/54442561/11208892
+
+    Args:
+        - p: np.array of single point, shape (2,) or 2D array, shape (x, 2)
+        - a: np.array of shape (x, 2)
+        - b: np.array of shape (x, 2)
+    """
+    # normalized tangent vectors
+    d_ba = b - a
+    d = np.divide(d_ba, (np.hypot(d_ba[:, 0], d_ba[:, 1])
+                           .reshape(-1, 1)))
+
+    # signed parallel distance components
+    # rowwise dot products of 2D vectors
+    s = np.multiply(a - p, d).sum(axis=1)
+    t = np.multiply(p - b, d).sum(axis=1)
+
+    # clamped parallel distance
+    h = np.maximum.reduce([s, t, np.zeros(len(s))])
+
+    # perpendicular distance component
+    # rowwise cross products of 2D vectors
+    d_pa = p - a
+    c = d_pa[:, 0] * d[:, 1] - d_pa[:, 1] * d[:, 0]
+
+    return np.hypot(h, c)
+
+
+def get_list_sides_shape(shape: DiagramShape):
+    print('holi')
+
+
+def compute_euclidean_distance(keypoint, shape: DiagramShape) -> (float, str):
+
+    list_sides_shape = get_list_sides_shape()
+    for slide_shape in list_sides_shape:
+        shortest_distance = compute_shortest_distance_v1(keypoint, slide_shape)
+
+    return 0, 'pred_class'
+
+
+def get_src_tgt_shapes(edge_candidate: DiagramEdge) -> (DiagramShape, DiagramShape):
+    k_src = edge_candidate.get_k_src()  # (x1, y1)
+    k_tgt = edge_candidate.get_k_tgt()  # (x2, y2)
+
+    s_src = DiagramShape()
+    s_tgt = DiagramShape()
+
+    return s_src, s_tgt
+
+
+def generate_random_id(size: int, chars=string.ascii_lowercase + string.digits) -> str:
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def create_xml_file(dict_nodes):
+def create_str_xml_file(dict_nodes: dict, diagram_filename_unique_id: str) -> str:
 
     # Add both namespaces and nsmap
     elem_maker_od = ElementMaker(namespace=NSMAP["od"], nsmap=NSMAP)
@@ -304,28 +383,52 @@ def create_xml_file(dict_nodes):
             elif diagram_node["pred_class_name"] == Consts.ACTOR:
                 id_diagram_node = "{0}_{1}".format(Consts.ACTOR.capitalize(), id_rand_node)
                 od_board.append(elem_maker_od.actor(id=id_diagram_node))
+            elif diagram_node["pred_class_name"] == Consts.LINE:
+                id_diagram_node = "{0}_{1}".format(Consts.LINK.capitalize(), id_rand_node)
+                od_board.append(elem_maker_od.link(id=id_diagram_node))
+            elif diagram_node["pred_class_name"] == Consts.ARROW:
+                id_diagram_node = "{0}_{1}".format(Consts.LINK.capitalize(), id_rand_node)
+                od_board.append(elem_maker_od.link(id=id_diagram_node))
             else:
                 id_diagram_node = "None"
             pred_box = ast.literal_eval(diagram_node["pred_box"])
-            x = pred_box[0]
-            y = pred_box[1]
+
             w = pred_box[2] - pred_box[0]
             h = pred_box[3] - pred_box[1]
-            list_id_nodes.append((id_diagram_node, x, y, w, h))
+
+            if w > 1000 or h > h:
+                x = pred_box[0] * 0.25
+                y = pred_box[1] * 0.25
+                w = (pred_box[2] * 0.25) - (pred_box[0] * 0.25)
+                h = (pred_box[3] * 0.25) - (pred_box[1] * 0.25)
+            else:
+                x = pred_box[0]
+                y = pred_box[1]
+                w = pred_box[2] - pred_box[0]
+                h = pred_box[3] - pred_box[1]
+
+            list_id_nodes.append((id_diagram_node, x, y, w, h, diagram_node["pred_class_name"]))
 
     od_di_plane = elem_maker_od_di.odPlane(id='Plane_debug', boardElement='Board_debug')
     od_di_board.append(od_di_plane)
 
     for d_node in list_id_nodes:
-        em_bound = elem_maker_dc.Bounds(x=str(d_node[1]), y=str(d_node[2]), width=str(d_node[3]), height=str(d_node[4]))
-        od_di_shape = elem_maker_od_di.odShape(id=d_node[0] + '_di', boardElement=d_node[0])
-        od_di_shape.append(em_bound)
-        od_di_plane.append(od_di_shape)
+        if (d_node[5] == Consts.ARROW) or (d_node[5] == Consts.LINE):
+            print('holi')
+        else:
+            em_bound = elem_maker_dc.Bounds(x=str(d_node[1]), y=str(d_node[2]), width=str(d_node[3]), height=str(d_node[4]))
+            od_di_shape = elem_maker_od_di.odShape(id=d_node[0] + '_di', boardElement=d_node[0])
+            od_di_shape.append(em_bound)
+            od_di_plane.append(od_di_shape)
 
-    # print(type(etree.tostring(od_root, pretty_print=True, xml_declaration=True, encoding='utf-8')))
-    # print(etree.dump(od_root))
+    et = etree.ElementTree(od_root)
+    et.write(PATH_DIR_DIAGRAMS + diagram_filename_unique_id + '.xml',
+             pretty_print=True,
+             xml_declaration=True,
+             encoding="utf-8")
 
     xml_str = etree.tostring(od_root, pretty_print=True, xml_declaration=True, encoding='utf-8')
+    # print(etree.dump(od_root))
 
     return xml_str
 

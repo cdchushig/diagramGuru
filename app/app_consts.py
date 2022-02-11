@@ -8,3 +8,6 @@ class Consts(object):
     DECISION = "decision"
     CIRCLE = "circle"
     OVAL = "oval"
+    LINE = "line"
+    ARROW = "arrow"
+    LINK = "link"
