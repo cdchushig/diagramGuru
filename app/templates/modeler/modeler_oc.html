@@ -5,9 +5,9 @@
   {% load static %}
   <link rel="stylesheet" href="{% static 'app/css/app.css' %}">
   <link rel="stylesheet" href="{% static 'app/css/od.css' %}">
+  <link rel="stylesheet" href="{% static 'app/css/odm.css' %}">
   <link rel="stylesheet" href="{% static 'app/css/od-codes.css' %}">
   <link rel="stylesheet" href="{% static 'app/css/od-embedded.css' %}">
-  <link rel="stylesheet" href="{% static 'app/icons/odm.css' %}">
   <link rel="stylesheet" href="{% static 'app/css/diagram-js.css' %}">
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
 </head>
@@ -90,8 +90,13 @@
         </button>
       </li>
       <li>
-        <button id="js-open-new" href class="pjs-buttons-active" title="open new board">
+        <button id="js-open-new" class="pjs-buttons-active" title="open new board">
           New diagram
+        </button>
+      </li>
+      <li>
+        <button id="save-diagram" title="save board">
+          Save diagram
         </button>
       </li>
     </ul>
@@ -112,5 +117,182 @@
       </li>
     </ul>
   </div>
-  <script src="{% static 'app/js/app.js' %}"></script>
+
+  <form>
+    {% csrf_token %}
+  </form>
+
+  <script src="{% static 'app/js/jquery-3.6.0.min.js' %}"></script>
+<!--  <script src="{% static 'app/js/popper.min.js' %}"></script>-->
+<!--  <script src="{% static 'app/js/bootstrap.min.js' %}"></script>-->
+<!--  <script src="{% static 'app/js/jquery.bootstrap.modal.forms.js' %}"></script>-->
+  <script src="{% static 'app/js/postit.js' %}"></script>
+<!--  <script src="{% static 'app/js/app.js' %}"></script>-->
+  <script>
+    // $(function() {
+
+    $('.buttons a').click(function(e) {
+      if (!$(this).is('.active')) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+
+    var id_bpmn = '{{ id_bpmn }}';
+    var isNewDiagram = false;
+
+    {% autoescape off %}
+      var bpmnFileContent = "{{ bpmn_file_content|escapejs }}"
+    {% endautoescape %}
+
+    const modeler = new PostItModeler.default({
+      container: '#canvas',
+      keyboard: {
+        bindTo: window
+      }
+    });
+
+    function isNewDiagram(id){
+      return (id == '' || id == '-1');
+    }
+
+    function downloadBpmn() {
+        const { xml } = modeler.saveXML({ format: true });
+        this._download('diagram.bpmn', xml);
+    }
+
+    function downloadSvg() {
+        const { svg } = modeler.saveSVG({ format: true });
+        this._download('diagram.svg', svg);
+    }
+
+    function download_xml(name, data) {
+        const encodedData = encodeURIComponent(data);
+        const link = document.createElement('a');
+        link.href = 'data:application/bpmn20-xml;charset=UTF-8,' + encodedData;
+        link.download = name;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function saveDiagram() {
+
+      console.log('saveDiagram');
+
+      modeler.saveXML({format: true}, function(err, xml) {
+
+        console.log('saveXML');
+
+        if (err) {
+          console.log('could not save diagram', err);
+          return console.error('could not save diagram', err);
+        }
+
+        console.log(xml);
+
+        var name = ''
+        if(id_bpmn == '' || id_bpmn == '-1')
+            name = window.prompt("What is the name of the diagram?", '');
+
+        if(name == '') {
+            alert('The diagram was not saved.')
+            return;
+        }
+
+        $.ajax({
+            type: 'post',
+            url: "/save_model/",
+            data: { name:name, xml_content:xml, id:id_bpmn},
+            success: function(returnData){
+                status = returnData.status;
+                msg = returnData.msg;
+                if(status == '0'){ // TODO: use enum or variable from django models instead of magic number
+                  alert('Error: ' + msg);
+                  console.log(msg);
+                }
+                else{
+                    alert(msg);
+                }
+            },
+            dataType: 'json',
+            headers: {'X-CSRFToken': $("input[name='csrfmiddlewaretoken']").val()}
+        });
+
+      });
+    }
+
+    function uploadBPMN(bpmnModeler) {
+      var FileUpload = document.myForm.uploadFile.files[0];
+      var fm = new FormData();
+      fm.append('multipartFile', FileUpload);
+        $.ajax({
+            url: publicurl + 'processDefinition/upload',
+            type: 'POST',
+            data: fm,
+            async: false,
+            contentType: false,
+            processData: false,
+            success: function (result) {
+                if (result.status == '0') {
+                    var url = publicurl + 'bpmn/' + result.obj;
+                    tools.openBPMN_URL(bpmnModeler, url);
+                } else {
+                    alert(result.msg);
+                }
+            },
+            error: function (err) {
+                alert(err)
+            }
+        })
+    }
+
+    function openDiagram(odXML) {
+
+      modeler.importXML(odXML, function (err) {
+        if (err) {
+          return console.error('could not import diagram', err);
+        }
+        var canvas = modeler.get('canvas');
+        var overlays = modeler.get('overlays');
+        canvas.zoom('fit-viewport');
+      });
+
+    }
+
+    function newDiagram(odXML) {
+
+      modeler.importXML(odXML, function (err) {
+        if (err) {
+          return console.error('could not import diagram', err);
+        }
+        var canvas = modeler.get('canvas');
+        var overlays = modeler.get('overlays');
+        canvas.zoom('fit-viewport');
+      });
+
+    }
+
+    openDiagram(bpmnFileContent);
+
+    $('#save-diagram').click(saveDiagram);
+    $('#new-diagram').click(newDiagram);
+
+    // });
+
+    // helpers //////////////////////
+    function debounce(fn, timeout) {
+      var timer;
+
+      return function() {
+        if (timer) {
+          clearTimeout(timer);
+        }
+
+        timer = setTimeout(fn, timeout);
+      };
+  }
+
+
+  </script>
 </html>

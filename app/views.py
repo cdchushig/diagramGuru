@@ -17,6 +17,8 @@ from django.conf import settings
 from django.contrib.auth.forms import AuthenticationForm
 from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.conf import settings
+from django.http import HttpResponse
 
 from rest_framework import status
 from rest_framework.decorators import api_view
@@ -39,10 +41,6 @@ import cv2
 
 from app.diagram_utils import compute_distance_between_nodes
 
-from bpmn_python_lib2.bpmn_python.bpmn_diagram_export import BpmnDiagramGraphExport
-from bpmn_python_lib2.bpmn_python.bpmn_diagram_layouter import generate_layout
-from bpmn_python_lib2.bpmn_e2_python.bpmn_e2_diagram_rep import BpmnE2DiagramGraph
-
 from lxml import etree
 from lxml.builder import ElementMaker
 from xml.etree.ElementTree import tostring
@@ -51,6 +49,8 @@ DIST_MIN_EDGING = 350
 PATH_DIAGRAM_GURU_PROJECT = os.path.dirname(os.path.dirname(__file__))
 PATH_DIR_UPLOADS = PATH_DIAGRAM_GURU_PROJECT + "/uploads/"
 PATH_DIR_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
+PATH_DIAGRAM_GURU_DIAGRAMS = PATH_DIAGRAM_GURU_PROJECT + '/diagrams/'
+
 PATH_VENV_DIAGRAM_GURU = ''
 
 BPMN_MODEL_NS = 'http://www.omg.org/spec/BPMN/20100524/MODEL'
@@ -146,15 +146,6 @@ def show_dashboard(request):
     return render(request, "dashboard.html", context={})
 
 
-def create_model(request):
-    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'bpmn', 'diagrams', 'default.bpmn')
-    with open(bpmn_filename, 'r') as f:
-        bpmn_file_content = f.read()
-    context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
-    template = 'modeler/modeler_oc.html'
-    return render(request, template, context)
-
-
 def list_diagram(request):
     logger.info('List diagrams')
     list_diagram = Diagram.objects.all()
@@ -172,7 +163,7 @@ def show_model(request):
         if upload_file_form.is_valid():
             diagram_name_unique_id = handle_uploaded_file(request.FILES['diagram_file'])
             request.session['diagram_name'] = diagram_name_unique_id
-            return HttpResponseRedirect('/bpmn/open_external_diagram')
+            return HttpResponseRedirect('/open_external_diagram')
     else:
         return HttpResponseRedirect('/')
 
@@ -393,19 +384,11 @@ def create_str_xml_file(dict_nodes: dict, diagram_filename_unique_id: str) -> st
                 id_diagram_node = "None"
             pred_box = ast.literal_eval(diagram_node["pred_box"])
 
+
+            x = pred_box[0]
+            y = pred_box[1]
             w = pred_box[2] - pred_box[0]
             h = pred_box[3] - pred_box[1]
-
-            if w > 1000 or h > h:
-                x = pred_box[0] * 0.25
-                y = pred_box[1] * 0.25
-                w = (pred_box[2] * 0.25) - (pred_box[0] * 0.25)
-                h = (pred_box[3] * 0.25) - (pred_box[1] * 0.25)
-            else:
-                x = pred_box[0]
-                y = pred_box[1]
-                w = pred_box[2] - pred_box[0]
-                h = pred_box[3] - pred_box[1]
 
             list_id_nodes.append((id_diagram_node, x, y, w, h, diagram_node["pred_class_name"]))
 
@@ -502,6 +485,98 @@ def create_graph_from_list_nodes(dict_objects, verbose=0):
 #         diagram_graph.add_edge(tuple_node[0], tuple_node[1])
 #
 #     return diagram_graph
+
+
+def delete_diagram(request, id):
+    try:
+        qs = Diagram.objects.filter(id=id)
+        if qs.exists():
+            name = qs[0].name
+            msg = u"Diagram '%s' deleted successfully!" % name
+            qs.delete()
+        else:
+            msg = None
+            tag_msg = None
+        tag_msg = 'success'
+    except Exception as err:
+        msg = err.message
+        tag_msg = 'error'
+    bpmn_list = Diagram.objects.all()
+    context = {'bpmn_list':bpmn_list, 'msg': msg, 'tag_msg': tag_msg}
+    template = 'bpmndesigner/list.html'
+    return render(request, template, context)
+
+
+def open_diagram(request, id):
+    try:
+        qs = Diagram.objects.filter(id=id)
+        if qs.exists():
+            bpmn = qs[0]
+            logger.info(bpmn)
+            bpmn_file_content = bpmn.xml_content
+            context = {'bpmn_file_content': bpmn_file_content, 'id_bpmn': bpmn.id}
+            return render(request, 'bpmn/modeler.html', context)
+
+    except Exception as err:
+        logger.error('Exception')
+        logger.error(err)
+
+
+def create_model(request):
+    bpmn_filename = os.path.join(settings.BASE_DIR, 'static', 'app', 'diagrams', 'blank-diagram.xml')
+    with open(bpmn_filename, 'r') as f:
+        bpmn_file_content = f.read()
+    context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
+    template = 'modeler/modeler_oc.html'
+    return render(request, template, context)
+
+
+def save_diagram(request):
+    try:
+        id = request.POST.get("id")
+        name = request.POST.get("name")
+        xml_content = request.POST.get("xml_content")
+
+        if id and id != '-1': # if id was given, then update the diagram and don't create a new one
+            qs = Diagram.objects.filter(id=id)
+            if qs.exists():
+                bpmn = qs[0]
+                bpmn.xml_content = xml_content
+                bpmn.save()
+                result_msg = "BPMN updated sucessfully!"
+                result_status = 2  # TODO: create an enum or choices to hold this status values
+        else:
+            # create a new diagram
+            bpmn = Diagram.objects.create(name=name, xml_content=xml_content)
+            bpmn.save()
+            result_msg = "BPMN saved sucessfully!"
+            result_status = 1  # TODO: create an enum or choices to hold this status values
+
+    except Exception as err:
+        logger.error(err)
+        result_msg = err.message
+        result_status = 0
+
+    return HttpResponse(content_type="application/json", content='{"status":"%d", "msg":"%s"}' % (result_status, result_msg))
+
+
+def open_external_diagram(request):
+    bpmn_filename_xml = request.session.get('diagram_name')
+    bpmn_filename = PATH_DIAGRAM_GURU_DIAGRAMS + bpmn_filename_xml + '.xml'
+
+    with open(bpmn_filename, 'r') as f:
+        bpmn_file_content = f.read()
+
+    context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
+    template = 'modeler/modeler_oc.html'
+    return render(request, template, context)
+
+    # tree = etree.parse(bpmn_path_filename_xml)
+    # xml_str = etree.tostring(tree.getroot())
+
+    # context = {'bpmn_file_content': xml_str, 'id_bpmn': 1}
+    # logger.info('Loaded xml file: %s', request.session.get('diagram_name'))
+    # return render(request, 'modeler_oc.html', context)
 
 
 def build_dictionary_with_connected_nodes(diagram_graph):
