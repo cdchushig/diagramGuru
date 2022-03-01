@@ -44,7 +44,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # 3rd party
-    # 'rest_framework',
     'bootstrap_modal_forms',
     'widget_tweaks',
     # Local
