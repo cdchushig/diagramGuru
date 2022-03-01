@@ -27,5 +27,8 @@ class DiagramShape(object):
     def set_list_edges(self, list_edges):
         self.list_edges = list_edges
 
+    def get_list_edges(self) -> list:
+        return self.list_edges
+
     def __str__(self):
         return "DiagramShape(id:" + str(self.id) + " pred_class:" + self.pred_class + ")"

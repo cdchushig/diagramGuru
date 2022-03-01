@@ -222,6 +222,7 @@ def get_filename_uid_and_ext(diagram_filename_with_extension):
 
 def handle_uploaded_file(diagram_file_uploaded):
     diagram_filename_uid, ext_file = get_filename_uid_and_ext(diagram_file_uploaded.name)
+    logger.info('Diagram file name: %s', diagram_filename_uid)
     path_diagram_filename_uid = PATH_DIR_UPLOADS + diagram_filename_uid + ext_file
     save_file_uploaded(diagram_file_uploaded, path_diagram_filename_uid)
     # Read and resize and image
@@ -229,6 +230,7 @@ def handle_uploaded_file(diagram_file_uploaded):
     diagram_img_resized = resize_image_by_wh(diagram_img, 800, None)
     is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img_resized)
     img_bytes = im_buf_arr.tobytes()
+    # Do request to api
     dict_diagram_objects = do_request_to_api_diagram_detector(img_bytes, path_diagram_filename_uid)
     lst_diagram_shapes, lst_diagram_edges = create_list_shape_edges_objects(diagram_img_resized, dict_diagram_objects)
 
@@ -262,13 +264,13 @@ def get_uid_diagram_element(pred_class_name: str) -> str:
     return id_diagram_element
 
 
-def get_list_shape_edge_elements(diagram_img: np.array, dict_diagram_objects: dict) -> (list, list):
+def get_list_shape_edge_elements(local_diagram_img: np.array, dict_diagram_objects: dict) -> (list, list):
 
     list_diagram_edges = []
     list_diagram_shapes = []
 
     for diagram_element in dict_diagram_objects["nodes"]:
-        pred_box = np.array(ast.literal_eval(diagram_element['pred_box']))
+        pred_box = np.array(ast.literal_eval(diagram_element['pred_box']), dtype='int')
         pred_class_name = diagram_element['pred_class_name']
         pred_score = diagram_element['score']
         id_diagram_element = get_uid_diagram_element(pred_class_name)
@@ -293,11 +295,13 @@ def get_list_shape_edge_elements(diagram_img: np.array, dict_diagram_objects: di
     list_diagram_edges_real = []
 
     for diagram_edge in list_diagram_edges:
-        crop_img = get_crop_img_by_bounding_box(diagram_img, diagram_edge.get_bounding_box())
+        crop_img = get_crop_img_by_bounding_box(local_diagram_img, diagram_edge.get_bounding_box())
         k_src, k_dst = process_lines(crop_img, diagram_edge.get_bounding_box())
-        diagram_edge.set_k_src(k_src)
-        diagram_edge.set_k_dst(k_dst)
-        list_diagram_edges_real.append(diagram_edge)
+
+        if k_src is not None and k_dst is not None:
+            diagram_edge.set_k_src(k_src)
+            diagram_edge.set_k_dst(k_dst)
+            list_diagram_edges_real.append(diagram_edge)
 
     list_diagram_shapes_real = list_diagram_shapes
 
@@ -318,7 +322,6 @@ def create_list_shape_edges_objects(diagram_img: np.array, dict_diagram_objects:
         for diagram_shape in lst_diagram_shapes:
             pred_box = diagram_shape.get_bounding_box()
             list_line_segments, m_a, m_b = get_list_line_segments(pred_box)
-            # print('dist: ', diagram_shape, diagram_edge.get_k_src(), diagram_edge.get_k_dst())
             lst_dist_src.append((diagram_shape.get_id(), compute_shortest_distance(diagram_edge.get_k_src(), m_a, m_b)))
             lst_dist_dst.append((diagram_shape.get_id(), compute_shortest_distance(diagram_edge.get_k_dst(), m_a, m_b)))
 
@@ -525,11 +528,14 @@ def create_str_xml_file(list_diagram_shapes: list, list_diagram_edges: list, dia
             elif pred_class_name == Consts.OVAL:
                 od_board.append(elem_maker_od.oval(id=diagram_shape.get_id(), attributeValues=diagram_shape.get_text()))
             elif pred_class_name == Consts.ACTOR:
-                od_board.append(elem_maker_od.actor(id=diagram_shape.get_id(), attributeValues=diagram_shape.get_text()))
-            elif pred_class_name == Consts.LINE:
-                od_board.append(elem_maker_od.link(id=diagram_shape.get_id(), attributeValues=diagram_shape.get_text()))
-            elif pred_class_name == Consts.ARROW:
-                od_board.append(elem_maker_od.link(id=diagram_shape.get_id()))
+                # od_board.append(elem_maker_od.actor(id=diagram_shape.get_id(), attributeValues=diagram_shape.get_text()))
+
+                od_shape_aux = elem_maker_od.actor(id=diagram_shape.get_id(), attributeValues = diagram_shape.get_text())
+                for link_shape in diagram_shape.get_list_edges():
+                    em_link = elem_maker_od.links(link_shape.get_id())
+                    od_shape_aux.append(em_link)
+
+                od_board.append(od_shape_aux)
             else:
                 id_diagram_node = "None"
 
@@ -543,18 +549,20 @@ def create_str_xml_file(list_diagram_shapes: list, list_diagram_edges: list, dia
             list_id_nodes.append((diagram_shape.get_id(), x, y, w, h, pred_class_name, 'odshape'))
 
     for diagram_edge in list_diagram_edges:
-        od_board.append(elem_maker_od.link(id=diagram_edge.get_id(),
-                                           sourceRef=diagram_edge.get_s_src(),
-                                           targetRef=diagram_edge.get_s_dst()))
-        x1, y1 = int(diagram_edge.get_k_src()[0]), int(diagram_edge.get_k_src()[1])
-        x2, y2 = int(diagram_edge.get_k_dst()[0]), int(diagram_edge.get_k_dst()[1])
-        print('sssss')
-        print(x1, y1)
-        print(type(x1), type(y1))
-        print(x2, y2)
-        print(type(x2), type(y2))
-        print('sssss')
-        list_id_nodes.append((diagram_edge.get_id(), x1, y1, x2, y2, diagram_edge.get_pred_class(), 'odlink'))
+        pred_class_name = diagram_edge.get_pred_class()
+        if pred_class_name == Consts.LINE:
+            od_board.append(elem_maker_od.link(id=diagram_edge.get_id(),
+                                               sourceRef=diagram_edge.get_s_src(),
+                                               targetRef=diagram_edge.get_s_dst()))
+        else: # Arrow
+            od_board.append(elem_maker_od.link(id=diagram_edge.get_id()))
+
+        x1 = diagram_edge.get_k_src()[0]
+        y1 = diagram_edge.get_k_src()[1]
+        x2 = diagram_edge.get_k_dst()[0]
+        y2 = diagram_edge.get_k_dst()[1]
+
+        list_id_nodes.append((diagram_edge.get_id(), x1, y2, x2, y1, diagram_edge.get_pred_class(), 'odlink'))
 
     od_di_plane = elem_maker_od_di.odPlane(id='Plane_debug', boardElement='Board_debug')
     od_di_board.append(od_di_plane)
@@ -562,7 +570,7 @@ def create_str_xml_file(list_diagram_shapes: list, list_diagram_edges: list, dia
     for d_node in list_id_nodes:
         if (d_node[5] == Consts.ARROW) or (d_node[5] == Consts.LINE):
             em_waypoint1 = elem_maker_od_di.waypoint(x=str(d_node[1]), y=str(d_node[2]))
-            em_waypoint2 = elem_maker_od_di.waypoint(x=str(d_node[2]), y=str(d_node[4]))
+            em_waypoint2 = elem_maker_od_di.waypoint(x=str(d_node[3]), y=str(d_node[4]))
             od_di_link = elem_maker_od_di.link(id=d_node[0] + '_di', boardElement=d_node[0])
             od_di_link.append(em_waypoint1)
             od_di_link.append(em_waypoint2)
