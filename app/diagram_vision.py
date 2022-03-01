@@ -28,10 +28,6 @@ def process_lines(img, pred_box):
 
     lines = cv2.HoughLinesP(edges, rho, theta, threshold, np.array([]), min_line_length, max_line_gap)
 
-    # for line in get_lines(lines):
-    #     leftx, boty, rightx, topy = line
-    #     cv2.line(img, (leftx, boty), (rightx, topy), (0, 0, 255), 6)
-
     _lines = []
 
     for _line in get_lines(lines):
@@ -57,16 +53,10 @@ def process_lines(img, pred_box):
     merged_lines_all.extend(merged_lines_y)
 
     if len(merged_lines_all) > 1:
-        print('the longest')
         tuple_src, tuple_dst = get_longest_line(merged_lines_all)
     else:
         tuple_src = merged_lines_all[0][0]
         tuple_dst = merged_lines_all[0][1]
-
-    print('tuples', pred_box, tuple_src, tuple_dst)
-
-    # k_src = np.array([tuple_src[0], tuple_src[1]])
-    # k_dst = np.array([tuple_dst[0], tuple_dst[1]])
 
     x_init = int(pred_box[0])
     y_init = int(pred_box[3])
@@ -77,8 +67,11 @@ def process_lines(img, pred_box):
     k_x2 = x_init + tuple_dst[0]
     k_y2 = y_init - tuple_dst[1]
 
-    k_1 = np.array([k_x1, k_y1])
-    k_2 = np.array([k_x2, k_y2])
+    # k_1 = np.array([k_x1, k_y1])
+    # k_2 = np.array([k_x2, k_y2])
+
+    k_1 = np.array([k_x1, k_y2])
+    k_2 = np.array([k_x2, k_y1])
 
     return k_1, k_2
 

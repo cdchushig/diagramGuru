@@ -328,27 +328,15 @@ def create_list_shape_edges_objects(diagram_img: np.array, dict_diagram_objects:
         uid_src_shape, uid_dst_shape = identify_src_dst_shapes(diagram_edge, lst_diagram_shapes, lst_dist_src, lst_dist_dst)
 
         if uid_src_shape == 0 and uid_dst_shape == 0:
-            # Remove current edge
             print('Removed current edge')
         else:
             diagram_edge.set_s_src(uid_src_shape)
             diagram_edge.set_s_dst(uid_dst_shape)
             lst_diagram_edges_final.append(diagram_edge)
 
-    for diagram_edge in lst_diagram_edges_final:
-        print('eee: ', diagram_edge)
-
     for diagram_shape in lst_diagram_shapes:
         lst_src_shapes = list(filter(lambda elem_edge: elem_edge.get_s_src() == diagram_shape.get_id(), lst_diagram_edges_final))
-        print('shape & edges', diagram_shape, lst_src_shapes)
         diagram_shape.set_list_edges(lst_src_shapes)
-        # for shape_aux in lst_src_shapes:
-        #     print(shape_aux)
-
-
-    # list_edges = get_list_edges_for_shape(diagram_shape.get_id())
-    # diagram_shape.set_list_edges(list_edges)
-    # list_diagram_shapes_real.append(diagram_shape)
 
     return lst_diagram_shapes, lst_diagram_edges_final
 
@@ -356,8 +344,8 @@ def create_list_shape_edges_objects(diagram_img: np.array, dict_diagram_objects:
 def identify_src_dst_shapes(diagram_edge: DiagramEdge, list_shapes: list,
                             list_dists_src: list, list_dists_dst: list) -> (str, str):
 
-    uid_src_shape, dist_src = get_uid_shape(list_dists_src)
-    uid_dst_shape, dist_dst = get_uid_shape(list_dists_dst)
+    uid_src_shape, dist_src = get_uid_shape(diagram_edge, list_dists_src)
+    uid_dst_shape, dist_dst = get_uid_shape(diagram_edge, list_dists_dst)
 
     # TODO check how many shapes can be matched
     shape_src = list(filter(lambda elem_shape: elem_shape.id == uid_src_shape, list_shapes))[0]
@@ -371,22 +359,20 @@ def identify_src_dst_shapes(diagram_edge: DiagramEdge, list_shapes: list,
         shape_src_aux = shape_src
         shape_src = shape_dst
         shape_dst = shape_src_aux
+        k_dst_aux = diagram_edge.get_k_dst()
+        k_src_aux = diagram_edge.get_k_src()
+        diagram_edge.set_k_src(k_dst_aux)
+        diagram_edge.set_k_dst(k_src_aux)
 
     return shape_src.get_id(), shape_dst.get_id()
 
-    # print(diagram_edge.get_id(), shape_src_match, dist_src)
-    # print(diagram_edge.get_id(), shape_dst_match, dist_dst)
 
-
-def get_uid_shape(list_dists: list) -> (int, float):
+def get_uid_shape(diagram_edge: DiagramEdge, list_dists: list) -> (int, float):
     list_uid_src = list(zip(*list_dists))[0]
     m_dist = np.array(list(zip(*list_dists))[1])
     v_idx = np.unravel_index(np.argmin(m_dist, axis=None), m_dist.shape)
     uid_src_shape = list_uid_src[v_idx[0]]
     dst_objs = m_dist[v_idx]
-
-    # print(diagram_edge.get_pred_class(), list_dists)
-
     return uid_src_shape, dst_objs
 
 
@@ -528,13 +514,10 @@ def create_str_xml_file(list_diagram_shapes: list, list_diagram_edges: list, dia
             elif pred_class_name == Consts.OVAL:
                 od_board.append(elem_maker_od.oval(id=diagram_shape.get_id(), attributeValues=diagram_shape.get_text()))
             elif pred_class_name == Consts.ACTOR:
-                # od_board.append(elem_maker_od.actor(id=diagram_shape.get_id(), attributeValues=diagram_shape.get_text()))
-
                 od_shape_aux = elem_maker_od.actor(id=diagram_shape.get_id(), attributeValues = diagram_shape.get_text())
                 for link_shape in diagram_shape.get_list_edges():
                     em_link = elem_maker_od.links(link_shape.get_id())
                     od_shape_aux.append(em_link)
-
                 od_board.append(od_shape_aux)
             else:
                 id_diagram_node = "None"
@@ -562,7 +545,7 @@ def create_str_xml_file(list_diagram_shapes: list, list_diagram_edges: list, dia
         x2 = diagram_edge.get_k_dst()[0]
         y2 = diagram_edge.get_k_dst()[1]
 
-        list_id_nodes.append((diagram_edge.get_id(), x1, y2, x2, y1, diagram_edge.get_pred_class(), 'odlink'))
+        list_id_nodes.append((diagram_edge.get_id(), x1, y1, x2, y2, diagram_edge.get_pred_class(), 'odlink'))
 
     od_di_plane = elem_maker_od_di.odPlane(id='Plane_debug', boardElement='Board_debug')
     od_di_board.append(od_di_plane)
