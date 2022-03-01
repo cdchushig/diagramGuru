@@ -1,5 +1,4 @@
 import os
-
 from django.shortcuts import render
 from django.conf import settings
 from django.http import HttpResponse
@@ -62,77 +61,7 @@ def modeler(request):
 #     return render(request, template, context)
 
 
-def save_diagram(request):
-    try:
-        id = request.POST.get("id")
-        name = request.POST.get("name")
-        xml_content = request.POST.get("xml_content")
-
-        if id and id != '-1': # if id was given, then update the diagram and don't create a new one
-            qs = Diagram.objects.filter(id=id)
-            if qs.exists():
-                bpmn = qs[0]
-                bpmn.xml_content = xml_content
-                bpmn.save()
-                result_msg = "BPMN updated sucessfully!"
-                result_status = 2  # TODO: create an enum or choices to hold this status values
-        else:
-            # create a new diagram
-            bpmn = Diagram.objects.create(name=name, xml_content=xml_content)
-            bpmn.save()
-            result_msg = "BPMN saved sucessfully!"
-            result_status = 1  # TODO: create an enum or choices to hold this status values
-
-    except Exception as err:
-        logger.error(err)
-        result_msg = err.message
-        result_status = 0
-
-    return HttpResponse(content_type="application/json", content='{"status":"%d", "msg":"%s"}' % (result_status, result_msg))
 
 
-def open_diagram(request, id):
-    try:
-        qs = Diagram.objects.filter(id=id)
-        if qs.exists():
-            bpmn = qs[0]
-            logger.info(bpmn)
-            bpmn_file_content = bpmn.xml_content
-            context = {'bpmn_file_content': bpmn_file_content, 'id_bpmn': bpmn.id}
-            return render(request, 'bpmn/modeler.html', context)
-
-    except Exception as err:
-        logger.error('Exception')
-        logger.error(err)
 
 
-def open_external_diagram(request):
-    bpmn_filename_xml = request.session.get('diagram_name')
-    bpmn_path_filename_xml = PATH_DIAGRAM_GURU_DIAGRAMS + bpmn_filename_xml + '.xml'
-    tree = etree.parse(bpmn_path_filename_xml)
-    xml_str = etree.tostring(tree.getroot())
-    context = {'bpmn_file_content': xml_str, 'id_bpmn': 1}
-
-    logger.info('Loaded xml file: %s', request.session.get('diagram_name'))
-
-    return render(request, 'modeler_oc.html', context)
-
-
-def delete_diagram(request, id):
-    try:
-        qs = Diagram.objects.filter(id=id)
-        if qs.exists():
-            name = qs[0].name
-            msg = u"Diagram '%s' deleted successfully!" % name
-            qs.delete()
-        else:
-            msg = None
-            tag_msg = None
-        tag_msg = 'success'
-    except Exception as err:
-        msg = err.message
-        tag_msg = 'error'
-    bpmn_list = Diagram.objects.all()
-    context = {'bpmn_list':bpmn_list, 'msg': msg, 'tag_msg': tag_msg}
-    template = 'bpmndesigner/list.html'
-    return render(request, template, context)
