@@ -1,32 +1,32 @@
-FROM python:3.7
+FROM python:3.6
 
-WORKDIR /var/www
-ADD . /var/www/
+RUN mkdir /app
+WORKDIR /app
+ADD . /app/
 
-ENV OPENCV_VERSION="4.0.1"
+# set default environment variables
+ENV PYTHONUNBUFFERED 1
+ENV LANG C.UTF-8
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-    build-essential \
-    cmake \
-    git \
-    wget \
-    unzip \
-    yasm \
-    pkg-config \
-    libswscale-dev \
-    libtbb2 \
-    libtbb-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libtiff-dev \
-    libopenjp2-7-dev \
-    libavformat-dev \
-    libpq-dev
+ENV PORT=8888
 
-RUN pip install -r requirements.txt
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        tzdata \
+        libopencv-dev \
+        build-essential \
+        libssl-dev \
+        libpq-dev \
+        libcurl4-gnutls-dev \
+        libexpat1-dev \
+        python3-setuptools \
+        python3-pip \
+        python3-dev \
+        git \
+        && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN chmod +x entrypoint.sh
+RUN pip3 install --upgrade pip
+RUN pip3 install -r requirements.txt
 
-# run entrypoint.sh
-ENTRYPOINT ["/var/www/entrypoint.sh"]
