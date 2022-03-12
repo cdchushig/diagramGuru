@@ -1,8 +1,7 @@
-FROM python:3.6
+FROM python:3.7
 
-RUN mkdir /app
-WORKDIR /app
-ADD . /app/
+RUN useradd --create-home appuser
+USER appuser
 
 # set default environment variables
 ENV PYTHONUNBUFFERED 1
@@ -26,6 +25,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /app
+WORKDIR /app
+ADD . /app/
 
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
