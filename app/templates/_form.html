@@ -17,21 +17,47 @@
 
         <div class="container">
             <br/>
-            <div class="col-md-5">
+            <div class="col-md-6">
 
                 <div class="vertical-project-form">
 
                     <h5 class="dark-text form-heading"><strong>{% trans "There is a option to analyze your diagram now!" %}</strong></h5>
 
-                    <div id="drop-area">
-                    <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/show_model">
-                        {% csrf_token %}
-                        {% trans "Please, if you have a diagram in the computer, you can analyze it here:" %}
-                        <input  name='diagram_file' type='file' class='filestyle' data-buttonText='Choose Diagram'>
+                    <div id="drop-area-upload">
+                      <form class="my-form" enctype="multipart/form-data" method="post" action="/show_model">
+                          {% csrf_token %}
+                        <p>If you have a diagram in the computer, you can analyze it here:</p>
+                        <progress id="progress-bar" max=100 value=0></progress>
+                        <div id="gallery" /></div>
+                        <input name=" diagram_file" type="file" id="fileElem" multiple="" onchange="handleFiles(this.files)">
+                        <label class="button" for="fileElem">Upload diagram</label>
                         <button id="upload" name='_upload' type="submit" class="btn btn-primary standard-button">{% trans "Analyze my diagram" %}</button>
                         {% csrf_token %}
-                    </form>
+                      </form>
                     </div>
+
+<!--                    <div class="drop-area">-->
+<!--                        <div class="row">-->
+<!--                            <div class="col-md-12">-->
+<!--                              <form name="form" method="post" action="/show_model" class="project-form" id="#">-->
+<!--                                  <div class="form-group files color">-->
+<!--                                    <label>Upload Your File </label>-->
+<!--                                    <input name='diagram_file' type="file" class="btn btn-primary standard-button" multiple="">-->
+<!--                                  </div>-->
+<!--                              </form>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                    <div id="drop-area">-->
+<!--                        <form name="form" class="project-form" enctype="multipart/form-data" method="post" action="/show_model">-->
+<!--                        {% csrf_token %}-->
+<!--                        {% trans "Please, if you have a diagram in the computer, you can analyze it here:" %}-->
+<!--                        <input  name='diagram_file' type='file' class='filestyle' data-buttonText='Choose Diagram'>-->
+<!--                        <button id="upload" name='_upload' type="submit" class="btn btn-primary standard-button">{% trans "Analyze my diagram" %}</button>-->
+<!--                        {% csrf_token %}-->
+<!--                        </form>-->
+<!--                    </div>-->
 
                     <form name="form_create" class="project-form" action="/create_model" method="get">
                         <button id="create" name='_create' type="submit" class="btn btn-primary standard-button">{% trans "Create my diagram" %}</button>
