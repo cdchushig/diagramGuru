@@ -7,8 +7,5 @@ db.sqlite3
 *.jpg
 *.jpeg
 *.png
-uploads/*.jpg
-uploads/*.jpeg
-uploads/*.png
-uploads/*.svg
+uploads/
 diagrams/
