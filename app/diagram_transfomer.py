@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import networkx as nx
 import cv2
 import ast
 import random
@@ -373,10 +372,6 @@ def create_str_xml_file(list_diagram_shapes: list, list_diagram_edges: list, dia
 
 
 def get_diagram_image_bytes(path_diagram_filename_uid, ext_file):
-    # diagram_img = cv2.imread(path_diagram_filename_uid)
-    # diagram_img_resized = resize_image_by_wh(diagram_img, 800, None)
-    # is_success, im_buf_arr = cv2.imencode(ext_file, diagram_img_resized)
-    # img_bytes = im_buf_arr.tobytes()
 
     diagram_img = cv2.imread(path_diagram_filename_uid)
     diagram_img_resized = resize_image_by_wh(diagram_img, 800, None)
@@ -502,24 +497,4 @@ def build_dictionary_with_connected_nodes(diagram_graph):
 
     return dict_tuples_nodes
 
-
-def build_list_tuples_connected_nodes(dict_tuples_nodes, diagram_graph):
-    """
-    Build list of tuples of nodes which are connected based on a minimum distance
-    :param dict_tuples_nodes:
-    :param diagram_graph:
-    :return:
-    """
-    list_node_edges = []
-    for id_node_x, list_nodes in dict_tuples_nodes.items():
-        list_aux_tuples = []
-        for id_node_y in list_nodes:
-            dist_nodes = compute_distance_between_nodes(diagram_graph.node[id_node_x]['data'],
-                                                        diagram_graph.node[id_node_y]['data'])
-            tuple_node = (id_node_x, id_node_y, dist_nodes)
-            list_aux_tuples.append(tuple_node)
-
-        list_node_edges.extend(get_nodes_with_minimum_distance(list_aux_tuples))
-
-    return list_node_edges
 
