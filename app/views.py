@@ -680,7 +680,7 @@ def create_model(request):
     with open(bpmn_filename, 'r') as f:
         bpmn_file_content = f.read()
     context = {'bpmn_filename': bpmn_filename, 'bpmn_file_content': bpmn_file_content, 'id_bpmn': -1}
-    template = 'modeler/modeler_oc.html'
+    template = 'modeler/modeler_creator.html'
     return render(request, template, context)
 
 
