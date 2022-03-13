@@ -37,10 +37,28 @@ docker-compose exec web python manage.py compilemessages
 ```
 
 #### Docker commands for accessing to database
+
+Build image with all dependencies:
+```shell script
+docker image build -t diagram_guru_web .
 ```
+
+Run container in bg:
+```shell script
+docker run -p 8080:8080 -d diagram_guru_web
+```
+
+Access to console of container:
+```shell script
+docker run -it diagram_guru_web
+```
+
+Access to database
+```shell script
 $ docker run -d -p 3306:3306 --name drscratchv3_database -e MYSQL_ROOT_PASSWORD=password mysql
 $ docker exec -it <containerid> mysql -p
 ```
+
 
 #### Access to terminal
 ```
@@ -52,23 +70,3 @@ $ docker exec -it <containerid> bash
 To improve the model, other images can be used in the training process. To get images for training and
 validation, an application for labeling images is needed. [LabelImg](https://github.com/tzutalin/labelImg), a graphical image annotation tool, will be used in this project.
 
-### Deploying the application with ansible and vagrant
-
-#### ssh to the box
-```
-$ vagrant ssh
-```
-#### Provisioning the box
-```
-$ vagrant provision
-```
-#### Reboot the box
-```
-$ vagrant reload
-```
-#### Shutdown the box
-```
-$ vagrant halt
-```
-
-Ansible is a configuration management and provisioning tool used to automate deployment tasks over ssh.

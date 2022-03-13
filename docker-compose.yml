@@ -4,19 +4,25 @@ services:
   web:
     build: .
     container_name: diagramguru_django
-    command: gunicorn diagramGuru.wsgi:application --bind 0.0.0.0:8000
+    command: bash -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
     ports:
-      - 8000:8000
+      - 9292:9292
     env_file:
-      - ./.env
+      - .env
     depends_on:
       - db
   db:
-    image: postgres:12.0-alpine
-    container_name: diagramguru_database
-    environment:
-      - POSTGRES_DB=${DIAGRAMGURU_DATABASE_NAME}
-      - POSTGRES_USER=${DIAGRAMGURU_DATABASE_USER}
-      - POSTGRES_PASSWORD=${DIAGRAMGURU_DATABASE_PASSWORD}
+    image: mysql:5.7
+    container_name: drscratchv3_database
     ports:
-      - "5432:5432"
+      - "3307:3306"
+    environment:
+      - MYSQL_DATABASE=${DRSCRATCH_DATABASE_NAME}
+      #- MYSQL_USER=${DRSCRATCH_DATABASE_USER}
+      - MYSQL_ROOT_PASSWORD=${DRSCRATCH_DATABASE_ROOT_PASSWORD}
+    healthcheck:
+      test: "/etc/init.d/mysql status"
+      timeout: 40s
+      retries: 10
+    volumes:
+      - dbdata:/var/run/mysqld

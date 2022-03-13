@@ -8,8 +8,6 @@ ENV PYTHONUNBUFFERED 1
 ENV LANG C.UTF-8
 ENV DEBIAN_FRONTEND=noninteractive
 
-ENV PORT=8888
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
         tzdata \
         libopencv-dev \
@@ -33,3 +31,4 @@ ADD . /app/
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
 
+EXPOSE 8080
